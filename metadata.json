@@ -1,0 +1,6 @@
+{
+  "name": "Kalyanpur Village Portal",
+  "description": "Digital Gram Panchayat Kalyanpur (Bokaro, Jharkhand) transparency portal with project tracking, chanda & donation ledger, and admin management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
