@@ -100,6 +100,7 @@ fun AdminScreen(
     var noticePriority by remember { mutableStateOf("महत्वपूर्ण (Important)") }
 
     var selectedAdminTab by remember { mutableStateOf(0) } // 0 = Yojnas, 1 = Registered Donors, 2 = Notices
+    var yojanaSubTab by remember { mutableStateOf(0) } // 0 = Chanda, 1 = Expenses
 
     var successMsg by remember { mutableStateOf("") }
     var successDialogMsg by remember { mutableStateOf<String?>(null) }
@@ -562,11 +563,11 @@ fun AdminScreen(
                                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Column {
                                             Text(if (isHindi) "चंदा जमा" else "Collected", fontSize = 11.sp, color = Color.Gray)
-                                            Text("₹${targetYojana.totalCollected}", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                            Text("₹$totalCollected", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
                                         }
                                         Column {
                                             Text(if (isHindi) "कुल खर्च" else "Spent", fontSize = 11.sp, color = Color.Gray)
-                                            Text("₹${targetYojana.totalSpent}", fontWeight = FontWeight.Bold, color = Color(0xFFC62828))
+                                            Text("₹$totalSpent", fontWeight = FontWeight.Bold, color = Color(0xFFC62828))
                                         }
                                         Column {
                                             Text(if (isHindi) "शेष राशि" else "Balance", fontSize = 11.sp, color = Color.Gray)
@@ -577,61 +578,19 @@ fun AdminScreen(
                             }
                         }
 
-                        // Add Chanda Donation for this Yojana
+                        // Left to Right Tabs for Chanda vs Expenses
                         item {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    Text(if (isHindi) "➕ इस योजना में नया चंदा जोड़ें" else "➕ Add Chanda for this Yojana", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                    
-                                    OutlinedButton(
-                                        onClick = { showDonorSelectDialog = true },
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(16.dp))
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(if (isHindi) "🔍 पंजीकृत दाता सूची से खोजें और चुनें" else "🔍 Search & Select from Registered Donors")
-                                    }
-
-                                    OutlinedTextField(value = donorName, onValueChange = { donorName = it }, label = { Text("दाता का नाम (Donor Name)") }, modifier = Modifier.fillMaxWidth())
-                                    OutlinedTextField(value = donorFatherName, onValueChange = { donorFatherName = it }, label = { Text("पिता/पति का नाम (Father's Name)") }, modifier = Modifier.fillMaxWidth())
-                                    OutlinedTextField(value = donorMobile, onValueChange = { donorMobile = it }, label = { Text("मोबाइल नंबर (Mobile No)") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
-                                    OutlinedTextField(value = donorAddress, onValueChange = { donorAddress = it }, label = { Text("गाँव / पता (Village / Address)") }, modifier = Modifier.fillMaxWidth())
-                                    OutlinedTextField(value = donorAmount, onValueChange = { donorAmount = it }, label = { Text("राशि (Amount ₹)") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-                                    OutlinedTextField(value = donorDate, onValueChange = { donorDate = it }, label = { Text("दिनांक (Date)") }, modifier = Modifier.fillMaxWidth())
-                                    Button(
-                                        onClick = {
-                                            if (donorName.isNotBlank() && donorAmount.isNotBlank()) {
-                                                viewModel.addDonor(
-                                                    Donor(
-                                                        projectId = targetYojana.id,
-                                                        donorName = donorName,
-                                                        fatherName = donorFatherName,
-                                                        mobile = donorMobile,
-                                                        address = donorAddress,
-                                                        amount = donorAmount.toLongOrNull() ?: 0L,
-                                                        date = donorDate,
-                                                        paymentMode = paymentMode
-                                                    )
-                                                ) {
-                                                    successDialogMsg = "✅ ₹$donorAmount चंदा ${donorName} से सफलतापूर्वक जुड़ गया!"
-                                                    Toast.makeText(context, "✅ ₹$donorAmount चंदा ${donorName} से सफलतापूर्वक जुड़ गया!", Toast.LENGTH_SHORT).show()
-                                                    Toast.makeText(context, "✅ ₹$donorAmount चंदा ${donorName} से सफलतापूर्वक जुड़ गया!", Toast.LENGTH_LONG).show()
-
-                                                    Toast.makeText(context, "✅ ₹$donorAmount चंदा ${donorName} से सफलतापूर्वक जुड़ गया!", Toast.LENGTH_LONG).show()
-                                                    donorName = ""
-                                                    donorFatherName = ""
-                                                    donorMobile = ""
-                                                    donorAddress = ""
-                                                    donorAmount = ""
-                                                    donorDate = "14 Oct 2026"
-                                                }
-                                            }
-                                        },
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text(if (isHindi) "चंदा सुरक्षित करें (Save Chanda)" else "Save Chanda")
-                                    }
-                                }
+                            TabRow(selectedTabIndex = yojanaSubTab) {
+                                Tab(
+                                    selected = yojanaSubTab == 0,
+                                    onClick = { yojanaSubTab = 0 },
+                                    text = { Text(if (isHindi) "💰 चंदा जमा (${currentYojanaDonors.size})" else "💰 Chanda (${currentYojanaDonors.size})", fontWeight = FontWeight.Bold) }
+                                )
+                                Tab(
+                                    selected = yojanaSubTab == 1,
+                                    onClick = { yojanaSubTab = 1 },
+                                    text = { Text(if (isHindi) "💸 खर्च विवरण (${currentYojanaExpenses.size})" else "💸 Expenses (${currentYojanaExpenses.size})", fontWeight = FontWeight.Bold) }
+                                )
                             }
                         }
 
@@ -655,7 +614,20 @@ fun AdminScreen(
                                                 it.mobile.contains(donorSelectSearchQuery, ignoreCase = true)
                                             }
                                             if (filteredRegistered.isEmpty()) {
-                                                Text(if (isHindi) "कोई पंजीकृत दाता नहीं मिला।" else "No registered donor found.", fontSize = 12.sp, color = Color.Gray)
+                                                Column(modifier = Modifier.padding(vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                                    Text(if (isHindi) "कोई पंजीकृत दाता नहीं मिला।" else "No registered donor found.", fontSize = 12.sp, color = Color.Gray)
+                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                    OutlinedButton(
+                                                        onClick = {
+                                                            showDonorSelectDialog = false
+                                                            selectedAdminTab = 1
+                                                        }
+                                                    ) {
+                                                        Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                        Spacer(modifier = Modifier.width(4.dp))
+                                                        Text(if (isHindi) "➕ नया दाता रजिस्टर करें" else "➕ Register New Donor")
+                                                    }
+                                                }
                                             } else {
                                                 LazyColumn(modifier = Modifier.height(250.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                                     items(filteredRegistered) { rd ->
@@ -681,176 +653,309 @@ fun AdminScreen(
                                         }
                                     },
                                     confirmButton = {
-                                        TextButton(onClick = { showDonorSelectDialog = false }) {
-                                            Text(if (isHindi) "बंद करें" else "Close")
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            TextButton(
+                                                onClick = {
+                                                    showDonorSelectDialog = false
+                                                    selectedAdminTab = 1
+                                                }
+                                            ) {
+                                                Text(if (isHindi) "➕ नया दाता रजिस्टर करें" else "➕ Register New")
+                                            }
+                                            TextButton(onClick = { showDonorSelectDialog = false }) {
+                                                Text(if (isHindi) "बंद करें" else "Close")
+                                            }
                                         }
                                     }
                                 )
                             }
                         }
 
-                        // Add Expense for this Yojana with Optional Bill Receipt Image
-                        item {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    Text(if (isHindi) "➕ इस योजना में नया खर्च जोड़ें (बिल फोटो वैकल्पिक)" else "➕ Add Expense (Optional Bill Receipt)", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                    OutlinedTextField(value = expenseTitle, onValueChange = { expenseTitle = it }, label = { Text("खर्च का कारण (Purpose)") }, modifier = Modifier.fillMaxWidth())
-                                    OutlinedTextField(value = expenseAmount, onValueChange = { expenseAmount = it }, label = { Text("खर्च राशि (Amount ₹)") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-                                    OutlinedTextField(value = expenseDate, onValueChange = { expenseDate = it }, label = { Text("दिनांक (Date)") }, modifier = Modifier.fillMaxWidth())
-                                    OutlinedTextField(value = billRef, onValueChange = { billRef = it }, label = { Text("रसीद संख्या (Bill Ref)") }, modifier = Modifier.fillMaxWidth())
-
-                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                        OutlinedButton(
-                                            onClick = { billPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                                            modifier = Modifier.weight(1f)
-                                        ) {
-                                            Icon(Icons.Default.Receipt, contentDescription = null, modifier = Modifier.size(16.dp))
-                                            Spacer(modifier = Modifier.width(4.dp))
-                                            Text(if (isHindi) "बिल रसीद फोटो जोड़ें (वैकल्पिक)" else "Add Bill Receipt (Optional)")
-                                        }
-                                        if (selectedBillUri != null) {
-                                            TextButton(onClick = { selectedBillUri = null }) { Text("Clear", color = MaterialTheme.colorScheme.error) }
-                                        }
-                                    }
-
-                                    if (selectedBillUri != null) {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(140.dp)
-                                                .clip(RoundedCornerShape(8.dp))
-                                        ) {
-                                            AsyncImage(model = selectedBillUri, contentDescription = null, modifier = Modifier.fillMaxSize())
-                                        }
-                                    }
-
-                                    Button(
-                                        onClick = {
-                                            if (expenseTitle.isNotBlank() && expenseAmount.isNotBlank()) {
-                                                coroutineScope.launch {
-                                                    isUploadingBill = true
-                                                    var billUrl = ""
-                                                    if (selectedBillUri != null) {
-                                                        try {
-                                                            billUrl = ImgBBClient.uploadUri(context, selectedBillUri!!) ?: ""
-                                                        } catch (e: Exception) {
-                                                            Log.e("Admin", "Bill upload error", e)
+                        if (yojanaSubTab == 0) {
+                            // Sub-Tab 0: Chanda Management (Add Chanda & Donors List)
+                            item {
+                                Card(modifier = Modifier.fillMaxWidth()) {
+                                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                        Text(if (isHindi) "➕ इस योजना में नया चंदा जोड़ें" else "➕ Add Chanda for this Yojana", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                        
+                                        // Selected Donor Display Card / Donor Picker Button
+                                        if (donorName.isNotBlank()) {
+                                            Card(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f))
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Column(modifier = Modifier.weight(1f)) {
+                                                        Text("👤 चयनित दाता: $donorName", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                                                        if (donorFatherName.isNotBlank() || donorMobile.isNotBlank()) {
+                                                            Text("पिता: ${donorFatherName.ifBlank { "N/A" }} | मो: ${donorMobile.ifBlank { "N/A" }}", fontSize = 11.sp, color = Color.DarkGray)
                                                         }
                                                     }
-                                                    viewModel.addExpense(
-                                                        Expense(
-                                                            projectId = targetYojana.id,
-                                                            title = expenseTitle,
-                                                            amount = expenseAmount.toLongOrNull() ?: 0L,
-                                                            date = expenseDate,
-                                                            billRef = billRef,
-                                                            imageUrl = billUrl
-                                                        )
-                                                    ) {
-                                                        successDialogMsg = "✅ ₹$expenseAmount खर्च सफलतापूर्वक जुड़ गया!"
-                                                        Toast.makeText(context, "✅ ₹$expenseAmount खर्च सफलतापूर्वक जुड़ गया!", Toast.LENGTH_SHORT).show()
-                                                        Toast.makeText(context, "✅ ₹$expenseAmount खर्च सफलतापूर्वक जुड़ गया!", Toast.LENGTH_LONG).show()
-
-                                                        Toast.makeText(context, "✅ ₹$expenseAmount खर्च सफलतापूर्वक जुड़ गया!", Toast.LENGTH_LONG).show()
-                                                        expenseTitle = ""
-                                                        expenseAmount = ""
-                                                        selectedBillUri = null
-                                                        isUploadingBill = false
+                                                    TextButton(onClick = { showDonorSelectDialog = true }) {
+                                                        Text("🔄 बदलें", fontWeight = FontWeight.Bold)
                                                     }
                                                 }
                                             }
-                                        },
-                                        enabled = !isUploadingBill,
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        if (isUploadingBill) {
-                                            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary)
                                         } else {
-                                            Text(if (isHindi) "खर्च सुरक्षित करें (Save Expense)" else "Save Expense")
+                                            OutlinedCard(
+                                                onClick = { showDonorSelectDialog = true },
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.SpaceBetween
+                                                ) {
+                                                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                                                        Icon(Icons.Default.PersonSearch, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                                        Spacer(modifier = Modifier.width(10.dp))
+                                                        Column {
+                                                            Text(if (isHindi) "👇 पंजीकृत दाता सूची से दाता चुनें" else "👇 Select Registered Donor", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                                            Text(if (isHindi) "केवल पंजीकृत दाताओं के नाम से ही चंदा जुड़ सकता है" else "Chanda entry requires choosing from donor directory", fontSize = 11.sp, color = Color.Gray)
+                                                        }
+                                                    }
+                                                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                                                }
+                                            }
+
+                                            OutlinedButton(
+                                                onClick = { selectedAdminTab = 1 },
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(if (isHindi) "➕ दाता सूची में नया दाता जोड़ें" else "➕ Register New Donor First")
+                                            }
+                                        }
+
+                                        OutlinedTextField(
+                                            value = donorAmount,
+                                            onValueChange = { donorAmount = it },
+                                            label = { Text("राशि (Amount ₹)") },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                                        )
+
+                                        OutlinedTextField(
+                                            value = donorDate,
+                                            onValueChange = { donorDate = it },
+                                            label = { Text("दिनांक (Date)") },
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+
+                                        Button(
+                                            onClick = {
+                                                val isRegistered = registeredDonors.any { it.name.trim().equals(donorName.trim(), ignoreCase = true) }
+                                                if (donorName.isBlank() || !isRegistered) {
+                                                    Toast.makeText(context, "⚠️ कृपया पहले पंजीकृत दाता सूची से दाता चुनें! यदि दाता नहीं है तो 'दाता सूची' में नया दाता जोड़ें।", Toast.LENGTH_LONG).show()
+                                                    showDonorSelectDialog = true
+                                                    return@Button
+                                                }
+                                                if (donorAmount.isBlank()) {
+                                                    Toast.makeText(context, "⚠️ कृपया चंदा राशि दर्ज करें!", Toast.LENGTH_SHORT).show()
+                                                    return@Button
+                                                }
+
+                                                viewModel.addDonor(
+                                                    Donor(
+                                                        projectId = targetYojana.id,
+                                                        donorName = donorName,
+                                                        fatherName = donorFatherName,
+                                                        mobile = donorMobile,
+                                                        address = donorAddress,
+                                                        amount = donorAmount.toLongOrNull() ?: 0L,
+                                                        date = donorDate,
+                                                        paymentMode = paymentMode
+                                                    )
+                                                ) {
+                                                    successDialogMsg = "✅ ₹$donorAmount चंदा ${donorName} से सफलतापूर्वक जुड़ गया!"
+                                                    Toast.makeText(context, "✅ ₹$donorAmount चंदा ${donorName} से सफलतापूर्वक जुड़ गया!", Toast.LENGTH_SHORT).show()
+                                                    donorName = ""
+                                                    donorFatherName = ""
+                                                    donorMobile = ""
+                                                    donorAddress = ""
+                                                    donorAmount = ""
+                                                    donorDate = "14 Oct 2026"
+                                                }
+                                            },
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            Text(if (isHindi) "चंदा सुरक्षित करें (Save Chanda)" else "Save Chanda")
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        // Donors list for this Yojana
-                        item {
-                            Text(if (isHindi) "इस योजना के चंदा दाता:" else "Donors list:", fontWeight = FontWeight.Bold)
-                        }
-                        if (currentYojanaDonors.isEmpty()) {
-                            item { Text(if (isHindi) "कोई चंदा नहीं है।" else "No donors yet.", fontSize = 12.sp, color = Color.Gray) }
-                        } else {
-                            val groupedAdminDonors = currentYojanaDonors.groupBy { Pair(it.donorName.trim(), it.mobile.trim()) }.entries.toList()
-                            items(groupedAdminDonors) { (key, entries) ->
-                                val donorName = key.first
-                                val donorMobile = key.second
-                                val sampleAddress = entries.firstOrNull()?.address ?: ""
-                                val totalPersonAmt = entries.sumOf { it.amount }
-                                Card(modifier = Modifier.fillMaxWidth()) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text(donorName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                                                if (donorMobile.isNotBlank() || sampleAddress.isNotBlank()) {
-                                                    Text(
-                                                        text = buildString {
-                                                            if (donorMobile.isNotBlank()) append("📱 $donorMobile")
-                                                            if (donorMobile.isNotBlank() && sampleAddress.isNotBlank()) append(" • ")
-                                                            if (sampleAddress.isNotBlank()) append("📍 $sampleAddress")
-                                                        },
-                                                        fontSize = 11.sp,
-                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                                    )
-                                                }
-                                            }
-                                            Text("कुल: ₹$totalPersonAmt", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF2E7D32))
-                                        }
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        entries.sortedBy { it.date }.forEach { d ->
+                            item {
+                                Text(if (isHindi) "इस योजना के चंदा दाता:" else "Donors list:", fontWeight = FontWeight.Bold)
+                            }
+                            if (currentYojanaDonors.isEmpty()) {
+                                item { Text(if (isHindi) "कोई चंदा नहीं है।" else "No donors yet.", fontSize = 12.sp, color = Color.Gray) }
+                            } else {
+                                val groupedAdminDonors = currentYojanaDonors.groupBy { Pair(it.donorName.trim(), it.mobile.trim()) }.entries.toList()
+                                items(groupedAdminDonors) { (key, entries) ->
+                                    val donorName = key.first
+                                    val donorMobile = key.second
+                                    val sampleAddress = entries.firstOrNull()?.address ?: ""
+                                    val totalPersonAmt = entries.sumOf { it.amount }
+                                    Card(modifier = Modifier.fillMaxWidth()) {
+                                        Column(modifier = Modifier.padding(12.dp)) {
                                             Row(
-                                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                                modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Column(modifier = Modifier.weight(1f)) {
-                                                    Text("${d.date} • ${d.paymentMode} • ₹${d.amount}", fontSize = 12.sp, color = Color(0xFF2E7D32))
+                                                    Text(donorName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                                    if (donorMobile.isNotBlank() || sampleAddress.isNotBlank()) {
+                                                        Text(
+                                                            text = buildString {
+                                                                if (donorMobile.isNotBlank()) append("📱 $donorMobile")
+                                                                if (donorMobile.isNotBlank() && sampleAddress.isNotBlank()) append(" • ")
+                                                                if (sampleAddress.isNotBlank()) append("📍 $sampleAddress")
+                                                            },
+                                                            fontSize = 11.sp,
+                                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                        )
+                                                    }
                                                 }
-                                                IconButton(onClick = { viewModel.deleteDonor(d.id, d.projectId, d.amount) }, modifier = Modifier.size(32.dp)) {
-                                                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
+                                                Text("कुल: ₹$totalPersonAmt", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFF2E7D32))
+                                            }
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Divider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            entries.sortedBy { it.date }.forEach { d ->
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Column(modifier = Modifier.weight(1f)) {
+                                                        Text("${d.date} • ${d.paymentMode} • ₹${d.amount}", fontSize = 12.sp, color = Color(0xFF2E7D32))
+                                                    }
+                                                    IconButton(onClick = { viewModel.deleteDonor(d.id, d.projectId, d.amount) }, modifier = Modifier.size(32.dp)) {
+                                                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-
-                        // Expenses list for this Yojana
-                        item {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(if (isHindi) "इस योजना के खर्च:" else "Expenses list:", fontWeight = FontWeight.Bold)
-                        }
-                        if (currentYojanaExpenses.isEmpty()) {
-                            item { Text(if (isHindi) "कोई खर्च नहीं है।" else "No expenses yet.", fontSize = 12.sp, color = Color.Gray) }
                         } else {
-                            items(currentYojanaExpenses) { e ->
+                            // Sub-Tab 1: Expenses Management (Add Expense & Expenses List)
+                            item {
                                 Card(modifier = Modifier.fillMaxWidth()) {
-                                    Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(e.title, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                            Text("${e.date} • ₹${e.amount} (${e.billRef})", fontSize = 12.sp, color = Color(0xFFC62828))
-                                            if (e.imageUrl.isNotBlank()) {
-                                                Text(if (isHindi) "📄 बिल रसीद संलग्न है" else "📄 Bill receipt attached", fontSize = 10.sp, color = MaterialTheme.colorScheme.primary)
+                                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                        Text(if (isHindi) "➕ इस योजना में नया खर्च जोड़ें (बिल फोटो वैकल्पिक)" else "➕ Add Expense (Optional Bill Receipt)", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                        OutlinedTextField(value = expenseTitle, onValueChange = { expenseTitle = it }, label = { Text("खर्च का कारण (Purpose)") }, modifier = Modifier.fillMaxWidth())
+                                        OutlinedTextField(value = expenseAmount, onValueChange = { expenseAmount = it }, label = { Text("खर्च राशि (Amount ₹)") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                                        OutlinedTextField(value = expenseDate, onValueChange = { expenseDate = it }, label = { Text("दिनांक (Date)") }, modifier = Modifier.fillMaxWidth())
+                                        OutlinedTextField(value = billRef, onValueChange = { billRef = it }, label = { Text("रसीद संख्या (Bill Ref)") }, modifier = Modifier.fillMaxWidth())
+
+                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                            OutlinedButton(
+                                                onClick = { billPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Icon(Icons.Default.Receipt, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                Spacer(modifier = Modifier.width(4.dp))
+                                                Text(if (isHindi) "बिल रसीद फोटो जोड़ें (वैकल्पिक)" else "Add Bill Receipt (Optional)")
+                                            }
+                                            if (selectedBillUri != null) {
+                                                TextButton(onClick = { selectedBillUri = null }) { Text("Clear", color = MaterialTheme.colorScheme.error) }
                                             }
                                         }
-                                        IconButton(onClick = { /* fixed */ }) {
-                                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+
+                                        if (selectedBillUri != null) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(140.dp)
+                                                    .clip(RoundedCornerShape(8.dp))
+                                            ) {
+                                                AsyncImage(model = selectedBillUri, contentDescription = null, modifier = Modifier.fillMaxSize())
+                                            }
+                                        }
+
+                                        Button(
+                                            onClick = {
+                                                if (expenseTitle.isNotBlank() && expenseAmount.isNotBlank()) {
+                                                    coroutineScope.launch {
+                                                        isUploadingBill = true
+                                                        var billUrl = ""
+                                                        if (selectedBillUri != null) {
+                                                            try {
+                                                                billUrl = ImgBBClient.uploadUri(context, selectedBillUri!!) ?: ""
+                                                            } catch (e: Exception) {
+                                                                Log.e("Admin", "Bill upload error", e)
+                                                            }
+                                                        }
+                                                        viewModel.addExpense(
+                                                            Expense(
+                                                                projectId = targetYojana.id,
+                                                                title = expenseTitle,
+                                                                amount = expenseAmount.toLongOrNull() ?: 0L,
+                                                                date = expenseDate,
+                                                                billRef = billRef,
+                                                                imageUrl = billUrl
+                                                            )
+                                                        ) {
+                                                            successDialogMsg = "✅ ₹$expenseAmount खर्च सफलतापूर्वक जुड़ गया!"
+                                                            Toast.makeText(context, "✅ ₹$expenseAmount खर्च सफलतापूर्वक जुड़ गया!", Toast.LENGTH_SHORT).show()
+                                                            expenseTitle = ""
+                                                            expenseAmount = ""
+                                                            selectedBillUri = null
+                                                            isUploadingBill = false
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            enabled = !isUploadingBill,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
+                                            if (isUploadingBill) {
+                                                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary)
+                                            } else {
+                                                Text(if (isHindi) "खर्च सुरक्षित करें (Save Expense)" else "Save Expense")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            item {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(if (isHindi) "इस योजना के खर्च:" else "Expenses list:", fontWeight = FontWeight.Bold)
+                            }
+                            if (currentYojanaExpenses.isEmpty()) {
+                                item { Text(if (isHindi) "कोई खर्च नहीं है।" else "No expenses yet.", fontSize = 12.sp, color = Color.Gray) }
+                            } else {
+                                items(currentYojanaExpenses) { e ->
+                                    Card(modifier = Modifier.fillMaxWidth()) {
+                                        Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(e.title, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                                Text("${e.date} • ₹${e.amount} (${e.billRef})", fontSize = 12.sp, color = Color(0xFFC62828))
+                                                if (e.imageUrl.isNotBlank()) {
+                                                    Text(if (isHindi) "📄 बिल रसीद संलग्न है" else "📄 Bill receipt attached", fontSize = 10.sp, color = MaterialTheme.colorScheme.primary)
+                                                }
+                                            }
+                                            IconButton(onClick = {
+                                                viewModel.deleteExpense(e.id, e.projectId, e.amount)
+                                                successDialogMsg = "🗑️ खर्च सफलतापूर्वक हटा दिया गया!"
+                                                Toast.makeText(context, "🗑️ खर्च हटा दिया गया!", Toast.LENGTH_SHORT).show()
+                                            }) {
+                                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                            }
                                         }
                                     }
                                 }
@@ -921,7 +1026,11 @@ fun AdminScreen(
                                                 }) {
                                                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
                                                 }
-                                                IconButton(onClick = { /* fixed */ }) {
+                                                IconButton(onClick = {
+                                                    viewModel.deleteProject(p.id)
+                                                    successDialogMsg = "🗑️ योजना '${p.title}' सफलतापूर्वक हटा दी गई!"
+                                                    Toast.makeText(context, "🗑️ योजना हटा दी गई!", Toast.LENGTH_SHORT).show()
+                                                }) {
                                                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
                                                 }
                                             }
@@ -1054,7 +1163,11 @@ fun AdminScreen(
                                                 }) {
                                                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
                                                 }
-                                                IconButton(onClick = { /* fixed */ }) {
+                                                IconButton(onClick = {
+                                                    viewModel.deleteRegisteredDonor(rd.id)
+                                                    successDialogMsg = "🗑️ पंजीकृत दाता '${rd.name}' सफलतापूर्वक हटा दिए गए!"
+                                                    Toast.makeText(context, "🗑️ पंजीकृत दाता हटा दिए गए!", Toast.LENGTH_SHORT).show()
+                                                }) {
                                                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
                                                 }
                                             }
@@ -1116,7 +1229,11 @@ fun AdminScreen(
                                                 Text(n.title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                                 Text(n.content, fontSize = 12.sp, color = Color.Gray)
                                             }
-                                            IconButton(onClick = { /* fixed */ }) {
+                                            IconButton(onClick = {
+                                                viewModel.deleteNotice(n.id)
+                                                successDialogMsg = "🗑️ सूचना सफलतापूर्वक हटा दी गई!"
+                                                Toast.makeText(context, "🗑️ सूचना हटा दी गई!", Toast.LENGTH_SHORT).show()
+                                            }) {
                                                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
                                             }
                                         }

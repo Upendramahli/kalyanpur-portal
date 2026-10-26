@@ -175,64 +175,6 @@ class KalyanpurRepository(private val db: FirebaseFirestore) {
     }
 
     suspend fun seedInitialDataIfNeeded() {
-        try {
-            val projSnap = projectsRef.get().await()
-            if (projSnap.isEmpty) {
-                val p1 = Project(
-                    title = "गाँव मुख्य सड़क पक्कीकरण योजना",
-                    description = "कल्याणपुर मुख्य चौक से शिव मंदिर तक पीसीसी रोड निर्माण कार्य।",
-                    category = "बुनियादी ढांचा (Infrastructure)",
-                    status = "प्रगति पर (Ongoing)",
-                    targetBudget = 250000L,
-                    totalCollected = 180000L,
-                    totalSpent = 120000L,
-                    startDate = "10 Oct 2026",
-                    createdBy = "पंचायत समिति"
-                )
-                val p2 = Project(
-                    title = "सोलर स्ट्रीट लाइट स्थापना योजना",
-                    description = "पूरेगाँव में सौर ऊर्जा आधारित स्ट्रीट लाइट लगाना ताकि रात में रोशनी रहे।",
-                    category = "बिजली एवं ऊर्जा (Energy)",
-                    status = "पूर्ण (Completed)",
-                    targetBudget = 80000L,
-                    totalCollected = 85000L,
-                    totalSpent = 78000L,
-                    startDate = "01 Sep 2026",
-                    createdBy = "ग्राम विकास समिति"
-                )
-                val p3 = Project(
-                    title = "स्वच्छता एवं वृक्षारोपण अभियान",
-                    description = "गाँव के तालाब और स्कूल परिसर की सफाई तथा पौधे लगाना।",
-                    category = "स्वच्छता अभियान (Cleanliness)",
-                    status = "आगामी (Upcoming)",
-                    targetBudget = 30000L,
-                    totalCollected = 15000L,
-                    totalSpent = 5000L,
-                    startDate = "20 Oct 2026",
-                    createdBy = "ग्राम युवा संघ"
-                )
-                val docRef1 = projectsRef.add(p1).await()
-                val docRef2 = projectsRef.add(p2).await()
-                val docRef3 = projectsRef.add(p3).await()
-
-                donorsRef.add(Donor(projectId = docRef1.id, donorName = "श्री रामेश्वर महतो", amount = 25000L, date = "11 Oct 2026", paymentMode = "नकद (Cash)")).await()
-                donorsRef.add(Donor(projectId = docRef1.id, donorName = "डॉ. वी. के. सिंह", amount = 50000L, date = "12 Oct 2026", paymentMode = "ऑनलाइन (Online)")).await()
-                donorsRef.add(Donor(projectId = docRef2.id, donorName = "कल्याणपुर युवा क्लब", amount = 30000L, date = "05 Sep 2026", paymentMode = "नकद (Cash)")).await()
-                donorsRef.add(Donor(projectId = docRef3.id, donorName = "मुखिया जी", amount = 15000L, date = "14 Oct 2026", paymentMode = "नकद (Cash)")).await()
-
-                expensesRef.add(Expense(projectId = docRef1.id, title = "सीमेंट और बालू खरीद", amount = 80000L, date = "13 Oct 2026", billRef = "Bill #102")).await()
-                expensesRef.add(Expense(projectId = docRef2.id, title = "10 सोलर लाइट सेट खरीद", amount = 78000L, date = "08 Sep 2026", billRef = "Bill #45")).await()
-                expensesRef.add(Expense(projectId = docRef3.id, title = "पौधे एवं खाद खरीद", amount = 5000L, date = "14 Oct 2026", billRef = "Bill #12")).await()
-
-                noticesRef.add(Notice(
-                    title = "विशेष ग्राम सभा बैठक की सूचना",
-                    content = "आगामी रविवार को पंचायत भवन कल्याणपुर में शीतकालीन विकास कार्यों व योजनाओं पर विशेष ग्राम सभा बैठक आयोजित की जाएगी। सभी ग्रामीण सादर आमंत्रित हैं।",
-                    date = "13 Oct 2026",
-                    priority = "महत्वपूर्ण (Important)"
-                )).await()
-            }
-        } catch (e: Exception) {
-            Log.e("Repository", "Failed to seed data", e)
-        }
+        // No-op: Demo data removed. App relies strictly on real Firebase Firestore data.
     }
 }

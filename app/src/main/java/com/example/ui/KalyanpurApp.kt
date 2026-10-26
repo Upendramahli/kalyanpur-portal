@@ -17,7 +17,7 @@ import com.example.ui.screens.*
 sealed class Screen(val route: String, val titleHindi: String, val titleEnglish: String, val icon: ImageVector) {
     object Home : Screen("home", "होम", "Home", Icons.Default.Home)
     object Yojnas : Screen("yojnas", "योजनाएं", "Yojnas", Icons.Default.Engineering)
-    object Notices : Screen("notices", "सूचनाएं", "Notices", Icons.Default.Notifications)
+    object Donors : Screen("donors", "दाता सूची", "Donors", Icons.Default.People)
     object Admin : Screen("admin", "एडमिन", "Admin", Icons.Default.AdminPanelSettings)
 }
 
@@ -37,12 +37,12 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
     var selectedYojana by remember { mutableStateOf<Project?>(null) }
-    var subScreenMode by remember { mutableStateOf<String?>(null) } // null, "donors", "expenses"
+    var subScreenMode by remember { mutableStateOf<String?>(null) } // null, "donors", "expenses", "notices"
 
     val items = listOf(
         Screen.Home,
         Screen.Yojnas,
-        Screen.Notices,
+        Screen.Donors,
         Screen.Admin
     )
 
@@ -68,18 +68,28 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 actions = {
-                    TextButton(onClick = { viewModel.toggleLanguage() }) {
-                        Text(
-                            text = if (isHindi) "ENGLISH" else "हिन्दी",
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                    IconButton(onClick = { subScreenMode = "notices" }) {
+                        BadgedBox(
+                            badge = {
+                                if (notices.isNotEmpty()) {
+                                    Badge {
+                                        Text(text = notices.size.toString())
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Notifications,
+                                contentDescription = "Notices",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
                     }
                 }
             )
         },
         bottomBar = {
-            if (selectedYojana == null) {
+            if (selectedYojana == null && subScreenMode == null) {
                 NavigationBar {
                     items.forEach { screen ->
                         val selected = currentScreen == screen
@@ -100,10 +110,17 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when {
+                subScreenMode == "notices" -> {
+                    NoticesScreen(
+                        isHindi = isHindi,
+                        notices = notices,
+                        onBack = { subScreenMode = null }
+                    )
+                }
                 selectedYojana != null && subScreenMode == "donors" -> {
                     DonorsListScreen(
                         project = selectedYojana!!,
-                        donors = donors.filter { it.projectId == selectedYojana!!.id },
+                        donors = donors.filter { it.projectId == selectedYojana!!.id || it.projectId == selectedYojana!!.title },
                         isHindi = isHindi,
                         onBack = { subScreenMode = null }
                     )
@@ -111,7 +128,7 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
                 selectedYojana != null && subScreenMode == "expenses" -> {
                     ExpensesListScreen(
                         project = selectedYojana!!,
-                        expenses = expenses.filter { it.projectId == selectedYojana!!.id },
+                        expenses = expenses.filter { it.projectId == selectedYojana!!.id || it.projectId == selectedYojana!!.title },
                         isHindi = isHindi,
                         onBack = { subScreenMode = null }
                     )
@@ -119,8 +136,8 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
                 selectedYojana != null -> {
                     YojanaDetailScreen(
                         project = selectedYojana!!,
-                        donors = donors.filter { it.projectId == selectedYojana!!.id },
-                        expenses = expenses.filter { it.projectId == selectedYojana!!.id },
+                        donors = donors.filter { it.projectId == selectedYojana!!.id || it.projectId == selectedYojana!!.title },
+                        expenses = expenses.filter { it.projectId == selectedYojana!!.id || it.projectId == selectedYojana!!.title },
                         isHindi = isHindi,
                         onBack = { selectedYojana = null },
                         onOpenDonors = { subScreenMode = "donors" },
@@ -137,7 +154,8 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
                             notices = notices,
                             onYojanaClick = { proj -> selectedYojana = proj },
                             onNavigateYojnas = { currentScreen = Screen.Yojnas },
-                            onNavigateNotices = { currentScreen = Screen.Notices }
+                            onNavigateDonors = { currentScreen = Screen.Donors },
+                            onNavigateNotices = { subScreenMode = "notices" }
                         )
                         is Screen.Yojnas -> ProjectsScreen(
                             isHindi = isHindi,
@@ -146,9 +164,10 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
                             expenses = expenses,
                             onYojanaClick = { proj -> selectedYojana = proj }
                         )
-                        is Screen.Notices -> NoticesScreen(
+                        is Screen.Donors -> AllDonorsScreen(
                             isHindi = isHindi,
-                            notices = notices
+                            projects = projects,
+                            donors = donors
                         )
                         is Screen.Admin -> AdminScreen(
                             isHindi = isHindi,
@@ -164,3 +183,5 @@ fun KalyanpurApp(viewModel: KalyanpurViewModel) {
         }
     }
 }
+
+

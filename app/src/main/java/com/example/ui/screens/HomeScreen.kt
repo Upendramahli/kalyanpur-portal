@@ -32,7 +32,8 @@ fun HomeScreen(
     notices: List<Notice>,
     onYojanaClick: (Project) -> Unit,
     onNavigateYojnas: () -> Unit,
-    onNavigateNotices: () -> Unit
+    onNavigateDonors: () -> Unit,
+    onNavigateNotices: (() -> Unit)? = null
 ) {
     val panchayatTitle = if (isHindi) "ग्राम पंचायत कल्याणपुर" else "Gram Panchayat Kalyanpur"
     val subtitleText = if (isHindi) "जिला - बोकारो, झारखण्ड | आधिकारिक पारदर्शिता पोर्टल" else "District - Bokaro, Jharkhand | Official Transparency Portal"
@@ -88,7 +89,7 @@ fun HomeScreen(
             }
         }
 
-        // Quick Services Navigation Grid (Removed Chanda Ledger as requested)
+        // Quick Services Navigation Grid
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -103,10 +104,10 @@ fun HomeScreen(
                 )
                 QuickServiceCard(
                     modifier = Modifier.weight(1f),
-                    title = if (isHindi) "सूचना पट" else "Notices",
-                    icon = Icons.Default.Notifications,
-                    color = Color(0xFF6A1B9A),
-                    onClick = onNavigateNotices
+                    title = if (isHindi) "दाता सूची" else "Donors Directory",
+                    icon = Icons.Default.People,
+                    color = Color(0xFF2E7D32),
+                    onClick = onNavigateDonors
                 )
             }
         }
@@ -233,7 +234,7 @@ fun HomeScreen(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                TextButton(onClick = onNavigateNotices) {
+                TextButton(onClick = { onNavigateNotices?.invoke() }) {
                     Text(viewAllText)
                 }
             }
