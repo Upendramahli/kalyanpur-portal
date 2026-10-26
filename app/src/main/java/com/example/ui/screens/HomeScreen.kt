@@ -1,5 +1,8 @@
 package com.example.ui.screens
 
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,10 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import coil.compose.AsyncImage
+import com.example.MainActivity
+import com.example.R
 import com.example.data.Donor
 import com.example.data.Expense
 import com.example.data.Notice
@@ -35,6 +44,12 @@ fun HomeScreen(
     onNavigateDonors: () -> Unit,
     onNavigateNotices: (() -> Unit)? = null
 ) {
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("pwa_install_prefs", Context.MODE_PRIVATE) }
+    var isInstalledOrDismissed by remember {
+        mutableStateOf(prefs.getBoolean("is_added_to_home_screen", false))
+    }
+
     val panchayatTitle = if (isHindi) "ग्राम पंचायत कल्याणपुर" else "Gram Panchayat Kalyanpur"
     val subtitleText = if (isHindi) "जिला - बोकारो, झारखण्ड | आधिकारिक पारदर्शिता पोर्टल" else "District - Bokaro, Jharkhand | Official Transparency Portal"
     val activeYojnasHeading = if (isHindi) "🏗️ सभी योजनाएं एवं अभियान (डैशबोर्ड)" else "🏗️ All Yojnas & Abhiyan Dashboards"
@@ -85,6 +100,99 @@ fun HomeScreen(
                         color = Color.White.copy(alpha = 0.9f),
                         fontSize = 12.sp
                     )
+                }
+            }
+        }
+
+        // Add to Home Screen Banner (PWA / App Shortcut Option)
+        if (!isInstalledOrDismissed) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Smartphone,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = if (isHindi) "📲 ऐप को होम स्क्रीन पर जोड़ें" else "📲 Add App to Home Screen",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                                Text(
+                                    text = if (isHindi) "1-क्लिक में मोबाइल होम स्क्रीन पर ऐप आइकॉन बनाएं।" else "Create 1-click app icon on mobile home screen.",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Button(
+                                onClick = {
+                                    try {
+                                        if (ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
+                                            val shortcutIntent = Intent(context, MainActivity::class.java).apply {
+                                                action = Intent.ACTION_MAIN
+                                            }
+                                            val pinShortcutInfo = ShortcutInfoCompat.Builder(context, "kalyanpur_app_shortcut")
+                                                .setShortLabel(if (isHindi) "कल्याणपुर पंचायत" else "Kalyanpur App")
+                                                .setLongLabel(if (isHindi) "ग्राम पंचायत कल्याणपुर" else "Gram Panchayat Kalyanpur")
+                                                .setIcon(IconCompat.createWithResource(context, R.mipmap.ic_launcher))
+                                                .setIntent(shortcutIntent)
+                                                .build()
+                                            ShortcutManagerCompat.requestPinShortcut(context, pinShortcutInfo, null)
+                                            Toast.makeText(
+                                                context,
+                                                if (isHindi) "होम स्क्रीन पर जोड़ने का अनुरोध भेजा गया!" else "Requested pinning to home screen!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                if (isHindi) "ब्राउज़र मेनू (⋮) खोलें और 'Add to Home screen' चुनें।" else "Open browser menu (⋮) and tap 'Add to Home screen'.",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            context,
+                                            if (isHindi) "ब्राउज़र मेनू (⋮) खोलें और 'Add to Home screen' चुनें।" else "Open browser menu (⋮) and tap 'Add to Home screen'.",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                    prefs.edit().putBoolean("is_added_to_home_screen", true).apply()
+                                    isInstalledOrDismissed = true
+                                },
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = if (isHindi) "होम स्क्रीन पर जोड़ें" else "Add to Home Screen",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
