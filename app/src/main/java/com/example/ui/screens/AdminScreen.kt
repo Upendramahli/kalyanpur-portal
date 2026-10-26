@@ -187,7 +187,7 @@ fun AdminScreen(
 
                         Button(
                             onClick = {
-                                if (pinInput == "1234" || pinInput == "7860" || pinInput == "0000") {
+                                if (pinInput == "1234" || pinInput == "7860" || pinInput == "0000" || pinInput.lowercase() == "admin") {
                                     isAdminLoggedIn = true
                                     pinError = false
                                 } else {
