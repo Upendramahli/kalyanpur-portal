@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>कल्याणपुर समिति - Chanda App</title>
+    <title>ग्राम पंचायत कल्याणपुर</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2E7D32">
+    <meta name="theme-color" content="#1E293B">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="कल्याणपुर समिति">
+    <meta name="apple-mobile-web-app-title" content="कल्याणपुर पंचायत">
     
     <!-- Material Symbols Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
@@ -21,14 +21,15 @@
 
     <style>
         :root {
-            --primary: #2E7D32;
-            --primary-light: #E8F5E9;
-            --secondary: #1976D2;
-            --bg: #F5F7FA;
-            --card-bg: #FFFFFF;
-            --text-main: #212121;
-            --text-sub: #616161;
-            --accent: #FF9800;
+            --bg-dark: #0F172A;
+            --surface-dark: #1E293B;
+            --surface-variant: #334155;
+            --primary-blue: #1D4ED8;
+            --primary-green: #15803D;
+            --accent-orange: #EA580C;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --card-border: #334155;
         }
 
         * {
@@ -40,25 +41,25 @@
         }
 
         body {
-            background-color: #1a1a2e;
+            background-color: #020617;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: var(--text-main);
+            color: var(--text-primary);
         }
 
-        /* App Container - Phone Frame on Desktop, Full Width on Mobile */
+        /* Phone frame layout on desktop, full screen on mobile */
         .app-container {
             width: 100%;
             max-width: 480px;
             height: 100vh;
             max-height: 920px;
-            background-color: var(--bg);
+            background-color: var(--bg-dark);
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             overflow: hidden;
         }
 
@@ -74,58 +75,62 @@
         @media (min-width: 501px) {
             .app-container {
                 border-radius: 24px;
-                border: 4px solid #333;
+                border: 4px solid #334155;
             }
         }
 
-        /* Top Bar */
+        /* Top App Bar */
         .top-bar {
-            background-color: var(--primary);
-            color: white;
-            padding: 16px;
+            background-color: #1E293B;
+            color: var(--text-primary);
+            padding: 14px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--card-border);
             z-index: 10;
         }
 
-        .top-bar-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .top-bar-actions {
+        .top-bar-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
+        .top-bar-title h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: #F8FAFC;
+        }
+
+        .top-bar-title p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
         .icon-btn {
             background: none;
             border: none;
-            color: white;
+            color: #F8FAFC;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            padding: 6px;
+            padding: 8px;
             border-radius: 50%;
         }
 
         .icon-btn:active {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
         }
 
         .badge {
             position: absolute;
-            top: 2px;
-            right: 2px;
-            background: #E53935;
+            top: 4px;
+            right: 4px;
+            background: #EF4444;
             color: white;
             font-size: 0.65rem;
             width: 16px;
@@ -137,31 +142,7 @@
             font-weight: bold;
         }
 
-        /* Add To Home Screen Banner */
-        .pwa-banner {
-            background-color: #E8F5E9;
-            border-bottom: 2px solid #C8E6C9;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            font-size: 0.9rem;
-        }
-
-        .pwa-banner-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        /* Content Scroll Area */
+        /* Main Scroll Content */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -171,80 +152,177 @@
             gap: 16px;
         }
 
-        /* Summary Cards */
-        .summary-card {
-            background: var(--card-bg);
+        /* Hero Banner Card */
+        .hero-card {
+            background: linear-gradient(135deg, #138808 0%, #0055A5 100%);
             border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: transform 0.1s ease;
+            gap: 6px;
         }
 
-        .summary-card:active {
-            transform: scale(0.98);
+        .hero-card .material-symbols-outlined {
+            font-size: 42px;
+            margin-bottom: 4px;
         }
 
-        .summary-info h3 {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            font-weight: 500;
-        }
-
-        .summary-info .amount {
-            font-size: 1.6rem;
+        .hero-card h2 {
+            font-size: 1.35rem;
             font-weight: 700;
-            color: var(--primary);
-            margin-top: 4px;
         }
 
-        .summary-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: var(--primary-light);
-            color: var(--primary);
+        .hero-card p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        /* Add to Home Screen PWA Card */
+        .pwa-card {
+            background-color: #1E293B;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pwa-card-top {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 12px;
         }
 
-        /* Section Headers */
+        .pwa-card-icon {
+            color: #38BDF8;
+            font-size: 32px;
+        }
+
+        .pwa-card-text h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .pwa-card-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .pwa-btn {
+            background-color: #38BDF8;
+            color: #0F172A;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            align-self: flex-end;
+            transition: opacity 0.2s;
+        }
+
+        .pwa-btn:active {
+            opacity: 0.8;
+        }
+
+        /* Quick Service Grid Cards */
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .service-card {
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.1s;
+        }
+
+        .service-card:active {
+            transform: scale(0.97);
+        }
+
+        .service-card.blue {
+            background-color: #1E3A8A;
+            border: 1px solid #2563EB;
+            color: #93C5FD;
+        }
+
+        .service-card.green {
+            background-color: #064E3B;
+            border: 1px solid #059669;
+            color: #6EE7B7;
+        }
+
+        .service-card .material-symbols-outlined {
+            font-size: 28px;
+        }
+
+        .service-card span.title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+
+        /* Section Header */
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 8px;
-            margin-bottom: 4px;
+            margin-top: 4px;
         }
 
-        .section-title {
-            font-size: 1.1rem;
+        .section-header h3 {
+            font-size: 1rem;
             font-weight: 700;
-            color: var(--text-main);
+            color: var(--text-primary);
         }
 
-        /* Search Bar */
+        .section-header p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .link-btn {
+            color: #38BDF8;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Search Input */
         .search-box {
             position: relative;
-            margin-bottom: 8px;
+            width: 100%;
         }
 
         .search-input {
             width: 100%;
             padding: 12px 16px 12px 42px;
-            border: 1px solid #E0E0E0;
+            border: 1px solid var(--card-border);
             border-radius: 12px;
-            font-size: 0.95rem;
-            background: white;
+            font-size: 0.9rem;
+            background: #1E293B;
+            color: white;
             outline: none;
         }
 
         .search-input:focus {
-            border-color: var(--primary);
+            border-color: #38BDF8;
         }
 
         .search-icon {
@@ -252,49 +330,153 @@
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-sub);
+            color: var(--text-secondary);
         }
 
-        /* List Items */
-        .item-card {
-            background: white;
-            border-radius: 14px;
-            padding: 14px 16px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        /* Yojna Item Card */
+        .yojna-card {
+            background-color: var(--surface-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .yojna-card:active {
+            background-color: var(--surface-variant);
+        }
+
+        .yojna-card-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
         }
 
-        .item-left {
+        .badge-chip {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .badge-chip.blue {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60A5FA;
+        }
+
+        .badge-chip.green {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ADE80;
+        }
+
+        .yojna-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+
+        .yojna-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .yojna-stats {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--card-border);
+            padding-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #4ADE80;
+        }
+
+        /* Generic List Item (Donor / Expense) */
+        .list-card {
+            background-color: var(--surface-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .list-card-left {
             display: flex;
             flex-direction: column;
             gap: 2px;
         }
 
-        .item-title {
+        .list-card-title {
+            font-size: 0.95rem;
             font-weight: 700;
-            font-size: 1rem;
-            color: var(--text-main);
+            color: #F8FAFC;
         }
 
-        .item-sub {
+        .list-card-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .list-card-right {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #4ADE80;
+        }
+
+        /* Notice Card */
+        .notice-card {
+            background-color: var(--surface-dark);
+            border-left: 4px solid #38BDF8;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .notice-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #F8FAFC;
+        }
+
+        .notice-desc {
             font-size: 0.85rem;
-            color: var(--text-sub);
+            color: #CBD5E1;
+            line-height: 1.4;
         }
 
-        .item-right {
+        .notice-date {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
             text-align: right;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--primary);
         }
 
-        /* Navigation Bar */
+        /* Bottom Navigation Bar */
         .bottom-nav {
-            background: white;
-            border-top: 1px solid #E0E0E0;
+            background-color: #1E293B;
+            border-top: 1px solid var(--card-border);
             display: flex;
             justify-content: space-around;
             padding: 8px 0;
@@ -305,11 +487,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 4px;
             background: none;
             border: none;
-            color: var(--text-sub);
-            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
             font-weight: 600;
             cursor: pointer;
             flex: 1;
@@ -317,50 +499,62 @@
         }
 
         .nav-item.active {
-            color: var(--primary);
+            color: #38BDF8;
         }
 
         .nav-item .material-symbols-outlined {
             font-size: 24px;
         }
 
-        /* Notice Card */
-        .notice-card {
-            background: white;
-            border-left: 4px solid var(--primary);
-            border-radius: 8px;
-            padding: 14px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            margin-bottom: 12px;
-        }
-
-        .notice-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .notice-desc {
-            font-size: 0.9rem;
-            color: #424242;
-            line-height: 1.4;
-        }
-
-        .notice-date {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            margin-top: 8px;
-            text-align: right;
-        }
-
-        /* Loader */
-        .loader {
+        /* Admin Form */
+        .admin-box {
+            background-color: var(--surface-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            color: var(--text-sub);
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .form-control {
+            background: #0F172A;
+            border: 1px solid var(--card-border);
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .btn-submit {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
         }
 
         .hidden {
@@ -371,56 +565,51 @@
 <body>
 
     <div class="app-container">
-        <!-- Top Bar -->
+        <!-- Top App Bar -->
         <div class="top-bar">
-            <button id="backBtn" class="icon-btn hidden" onclick="goHome()">
-                <span class="material-symbols-outlined">arrow_back</span>
-            </button>
-            <div class="top-bar-title" id="pageTitle">
-                <span class="material-symbols-outlined">account_balance_wallet</span>
-                <span>कल्याणपुर विकास समिति</span>
-            </div>
-            <div class="top-bar-actions">
-                <button class="icon-btn" onclick="switchTab('notices')" title="सूचनाएं">
-                    <span class="material-symbols-outlined">notifications</span>
-                    <span id="noticeBadge" class="badge hidden">0</span>
+            <div class="top-bar-left">
+                <button id="backBtn" class="icon-btn hidden" onclick="goBack()">
+                    <span class="material-symbols-outlined">arrow_back</span>
                 </button>
+                <div class="top-bar-title" id="pageTitle">
+                    <h1>ग्राम पंचायत कल्याणपुर</h1>
+                    <p>बोकारो, झारखण्ड</p>
+                </div>
             </div>
+            <button class="icon-btn" onclick="openNoticesPage()" title="सूचनाएं">
+                <span class="material-symbols-outlined">notifications</span>
+                <span id="noticeBadge" class="badge hidden">0</span>
+            </button>
         </div>
 
-        <!-- Add to Home Screen Banner -->
-        <div id="pwaBanner" class="pwa-banner">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-outlined" style="color: var(--primary);">add_to_home_screen</span>
-                <span>ऐप को मोबाइल होम स्क्रीन पर जोड़ें</span>
-            </div>
-            <button class="pwa-banner-btn" onclick="addToHomeScreen()">Add to Home Screen</button>
-        </div>
-
-        <!-- Main Dynamic Content Container -->
+        <!-- Main Dynamic Content Area -->
         <div class="content-area" id="mainContent">
-            <!-- Dynamic Content Injected Here via JavaScript -->
+            <!-- Rendered dynamically -->
         </div>
 
-        <!-- Bottom Navigation -->
+        <!-- Bottom Navigation Bar -->
         <div class="bottom-nav">
             <button id="navHome" class="nav-item active" onclick="switchTab('home')">
                 <span class="material-symbols-outlined">home</span>
                 <span>होम</span>
             </button>
-            <button id="navDonors" class="nav-item" onclick="switchTab('donors')">
-                <span class="material-symbols-outlined">group</span>
-                <span>दानदाता सूची</span>
+            <button id="navYojnas" class="nav-item" onclick="switchTab('yojnas')">
+                <span class="material-symbols-outlined">engineering</span>
+                <span>योजनाएं</span>
             </button>
-            <button id="navNotices" class="nav-item" onclick="switchTab('notices')">
-                <span class="material-symbols-outlined">campaign</span>
-                <span>सूचनाएं</span>
+            <button id="navDonors" class="nav-item" onclick="switchTab('donors')">
+                <span class="material-symbols-outlined">groups</span>
+                <span>दाता सूची</span>
+            </button>
+            <button id="navAdmin" class="nav-item" onclick="switchTab('admin')">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span>एडमिन</span>
             </button>
         </div>
     </div>
 
     <script>
-        // Firebase Configuration
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBBV9CHKtYdx1kFK0u0dJQAlCxRwRBSjDs",
             authDomain: "gen-lang-client-0040997999.firebaseapp.com",
@@ -428,7 +617,6 @@
             storageBucket: "gen-lang-client-0040997999.firebasestorage.app"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -436,29 +624,27 @@
         // Target Firestore Database
         const db = firebase.app().firestore("ai-studio-android-kalyanpu-c4bb409e-4099-4c4f-b05f-1ddd344d1652");
 
-        // State Data
+        // State variables
         let projects = [];
         let donors = [];
+        let expenses = [];
         let notices = [];
-        let registeredDonors = [];
         let currentTab = 'home';
         let searchQuery = '';
-        let selectedYojnaId = null;
+        let selectedProject = null;
+        let showNoticesScreen = false;
+        let isAdminLoggedIn = false;
 
-        // PWA Install Prompt handling
+        // PWA Install Prompt
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const isInstalled = localStorage.getItem('pwa_installed');
-            if (!isInstalled) {
-                document.getElementById('pwaBanner').classList.remove('hidden');
+            if (!localStorage.getItem('pwa_installed')) {
+                const banner = document.getElementById('pwaBanner');
+                if (banner) banner.classList.remove('hidden');
             }
         });
-
-        if (localStorage.getItem('pwa_installed') === 'true') {
-            document.getElementById('pwaBanner').classList.add('hidden');
-        }
 
         function addToHomeScreen() {
             if (deferredPrompt) {
@@ -466,34 +652,33 @@
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         localStorage.setItem('pwa_installed', 'true');
-                        document.getElementById('pwaBanner').classList.add('hidden');
+                        renderCurrentView();
                     }
                     deferredPrompt = null;
                 });
             } else {
-                alert("होम स्क्रीन पर जोड़ने के लिए ब्राउजर मेनू से 'Add to Home screen' चुनें।");
+                alert("होम स्क्रीन पर जोड़ने के लिए ब्राउज़र मेनू (⋮) खोलें और 'Add to Home screen' चुनें।");
                 localStorage.setItem('pwa_installed', 'true');
-                document.getElementById('pwaBanner').classList.add('hidden');
+                renderCurrentView();
             }
         }
 
-        // Fetch Real-time Firestore Data
-        function initFirestoreListeners() {
-            // Listen to Projects / Yojna
-            db.collection("projects").onSnapshot(snapshot => {
-                projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Fetch Firestore Realtime Data
+        function initListeners() {
+            db.collection("projects").onSnapshot(s => {
+                projects = s.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderCurrentView();
             });
-
-            // Listen to Donors
-            db.collection("donors").onSnapshot(snapshot => {
-                donors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            db.collection("donors").onSnapshot(s => {
+                donors = s.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderCurrentView();
             });
-
-            // Listen to Notices
-            db.collection("notices").onSnapshot(snapshot => {
-                notices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            db.collection("expenses").onSnapshot(s => {
+                expenses = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderCurrentView();
+            });
+            db.collection("notices").onSnapshot(s => {
+                notices = s.docs.map(d => ({ id: d.id, ...d.data() }));
                 const badge = document.getElementById('noticeBadge');
                 if (notices.length > 0) {
                     badge.innerText = notices.length;
@@ -505,141 +690,217 @@
             });
         }
 
-        // Navigation
+        // Navigation Management
         function switchTab(tab) {
             currentTab = tab;
-            selectedYojnaId = null;
+            selectedProject = null;
+            showNoticesScreen = false;
             searchQuery = '';
-            
+
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('backBtn').classList.add('hidden');
 
             if (tab === 'home') {
                 document.getElementById('navHome').classList.add('active');
-                document.getElementById('pageTitle').innerHTML = '<span class="material-symbols-outlined">account_balance_wallet</span> <span>कल्याणपुर विकास समिति</span>';
+                document.getElementById('pageTitle').innerHTML = '<h1>ग्राम पंचायत कल्याणपुर</h1><p>बोकारो, झारखण्ड</p>';
+            } else if (tab === 'yojnas') {
+                document.getElementById('navYojnas').classList.add('active');
+                document.getElementById('pageTitle').innerHTML = '<h1>सभी योजनाएं एवं अभियान</h1><p>बोकारो, झारखण्ड</p>';
             } else if (tab === 'donors') {
                 document.getElementById('navDonors').classList.add('active');
-                document.getElementById('pageTitle').innerHTML = '<span>दानदाता सूची</span>';
-            } else if (tab === 'notices') {
-                document.getElementById('navNotices').classList.add('active');
-                document.getElementById('pageTitle').innerHTML = '<span>सूचनाएं</span>';
+                document.getElementById('pageTitle').innerHTML = '<h1>दाता सूची</h1><p>समस्त दानदाताओं की सूची</p>';
+            } else if (tab === 'admin') {
+                document.getElementById('navAdmin').classList.add('active');
+                document.getElementById('pageTitle').innerHTML = '<h1>एडमिन पोर्टल</h1><p>प्रबंधन एवं डाटा प्रविष्टि</p>';
             }
 
             renderCurrentView();
         }
 
-        function viewYojnaDonors(yojnaId, yojnaName) {
-            selectedYojnaId = yojnaId;
+        function openNoticesPage() {
+            showNoticesScreen = true;
             document.getElementById('backBtn').classList.remove('hidden');
-            document.getElementById('pageTitle').innerHTML = `<span>${yojnaName || 'योजना विवरण'}</span>`;
-            renderYojnaDetailView(yojnaId, yojnaName);
+            document.getElementById('pageTitle').innerHTML = '<h1>नवीनतम सूचनाएं</h1><p>आधिकारिक घोषणाएं</p>';
+            renderNoticesView();
         }
 
-        function goHome() {
-            switchTab('home');
+        function openYojnaDetail(projId) {
+            selectedProject = projects.find(p => p.id === projId) || null;
+            if (selectedProject) {
+                document.getElementById('backBtn').classList.remove('hidden');
+                document.getElementById('pageTitle').innerHTML = `<h1>${selectedProject.title}</h1><p>योजना का पूरा विवरण एवं हिसाब</p>`;
+                renderYojnaDetailView();
+            }
         }
 
-        // Render Routing
+        function goBack() {
+            if (showNoticesScreen || selectedProject) {
+                selectedProject = null;
+                showNoticesScreen = false;
+                switchTab(currentTab);
+            }
+        }
+
         function renderCurrentView() {
-            if (selectedYojnaId) {
-                const proj = projects.find(p => p.id === selectedYojnaId);
-                renderYojnaDetailView(selectedYojnaId, proj ? proj.title : '');
+            if (showNoticesScreen) {
+                renderNoticesView();
+                return;
+            }
+            if (selectedProject) {
+                renderYojnaDetailView();
                 return;
             }
 
             if (currentTab === 'home') renderHomeView();
+            else if (currentTab === 'yojnas') renderYojnasView();
             else if (currentTab === 'donors') renderDonorsView();
-            else if (currentTab === 'notices') renderNoticesView();
+            else if (currentTab === 'admin') renderAdminView();
         }
 
-        // 1. Home View
+        // 1. Home View (Matches Jetpack Compose Preview Exactly!)
         function renderHomeView() {
-            const totalChanda = donors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+            const isPwaInstalled = localStorage.getItem('pwa_installed') === 'true';
 
             let html = `
-                <!-- Total Chanda Card -->
-                <div class="summary-card" onclick="switchTab('donors')">
-                    <div class="summary-info">
-                        <h3>कुल प्राप्त चंदा</h3>
-                        <div class="amount">₹ ${totalChanda.toLocaleString('en-IN')}</div>
+                <!-- Hero Header Card -->
+                <div class="hero-card">
+                    <span class="material-symbols-outlined">account_balance</span>
+                    <h2>ग्राम पंचायत कल्याणपुर</h2>
+                    <p>जिला - बोकारो, झारखण्ड | आधिकारिक पारदर्शिता पोर्टल</p>
+                </div>
+            `;
+
+            // Add to Home Screen Banner if not dismissed/installed
+            if (!isPwaInstalled) {
+                html += `
+                    <div id="pwaBanner" class="pwa-card">
+                        <div class="pwa-card-top">
+                            <span class="material-symbols-outlined pwa-card-icon">smartphone</span>
+                            <div class="pwa-card-text">
+                                <h3>📲 ऐप को होम स्क्रीन पर जोड़ें</h3>
+                                <p>1-क्लिक में मोबाइल होम स्क्रीन पर ऐप आइकॉन बनाएं।</p>
+                            </div>
+                        </div>
+                        <button class="pwa-btn" onclick="addToHomeScreen()">होम स्क्रीन पर जोड़ें</button>
                     </div>
-                    <div class="summary-icon">
-                        <span class="material-symbols-outlined">payments</span>
+                `;
+            }
+
+            // Quick Service Cards
+            html += `
+                <div class="service-grid">
+                    <div class="service-card blue" onclick="switchTab('yojnas')">
+                        <span class="material-symbols-outlined">engineering</span>
+                        <span class="title">सभी योजनाएं</span>
+                    </div>
+                    <div class="service-card green" onclick="switchTab('donors')">
+                        <span class="material-symbols-outlined">groups</span>
+                        <span class="title">दाता सूची</span>
                     </div>
                 </div>
 
-                <!-- Active Yojnas Section -->
+                <!-- Yojna Dashboard Section -->
                 <div class="section-header">
-                    <div class="section-title">सक्रिय योजनाएं</div>
+                    <div>
+                        <h3>🏗️ सभी योजनाएं एवं अभियान (डैशबोर्ड)</h3>
+                        <p>किसी भी योजना पर क्लिक करके उसका पूरा हिसाब देखें:</p>
+                    </div>
                 </div>
             `;
 
             if (projects.length === 0) {
-                html += `<div class="loader">कोई योजना उपलब्ध नहीं है</div>`;
+                html += `<div class="empty-state">कोई योजना उपलब्ध नहीं है।</div>`;
             } else {
                 projects.forEach(p => {
-                    const yojnaDonors = donors.filter(d => d.projectId === p.id);
-                    const yojnaTotal = yojnaDonors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                    const projDonors = donors.filter(d => d.projectId === p.id || d.projectId === p.title);
+                    const projExpenses = expenses.filter(e => e.projectId === p.id || e.projectId === p.title);
+                    const totalCollected = projDonors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                    const totalSpent = projExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+                    const balance = totalCollected - totalSpent;
 
                     html += `
-                        <div class="item-card" onclick="viewYojnaDonors('${p.id}', '${p.title.replace(/'/g, "\\'")}')">
-                            <div class="item-left">
-                                <div class="item-title">${p.title}</div>
-                                <div class="item-sub">${yojnaDonors.length} दानदाता</div>
+                        <div class="yojna-card" onclick="openYojnaDetail('${p.id}')">
+                            <div class="yojna-card-top">
+                                <span class="badge-chip blue">${p.category || 'विकास कार्य'}</span>
+                                <span class="badge-chip green">${p.status || 'सक्रिय'}</span>
                             </div>
-                            <div class="item-right">
-                                ₹ ${yojnaTotal.toLocaleString('en-IN')}
+                            <div class="yojna-title">${p.title}</div>
+                            <div class="yojna-desc">${p.description || ''}</div>
+                            <div class="yojna-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">कुल जमा</span>
+                                    <span class="stat-value">₹ ${totalCollected.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">कुल खर्च</span>
+                                    <span class="stat-value" style="color:#EF4444;">₹ ${totalSpent.toLocaleString('en-IN')}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">शेष राशि</span>
+                                    <span class="stat-value" style="color:#38BDF8;">₹ ${balance.toLocaleString('en-IN')}</span>
+                                </div>
                             </div>
                         </div>
                     `;
                 });
             }
 
-            document.getElementById('mainContent').innerHTML = html;
-        }
-
-        // 2. Yojna Detail View (Clicking Total Chanda or Yojna)
-        function renderYojnaDetailView(yojnaId, yojnaName) {
-            const yojnaDonors = donors.filter(d => d.projectId === yojnaId);
-            const totalAmount = yojnaDonors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
-
-            let html = `
-                <div class="summary-card" style="margin-bottom: 8px;">
-                    <div class="summary-info">
-                        <h3>योजना का कुल चंदा</h3>
-                        <div class="amount">₹ ${totalAmount.toLocaleString('en-IN')}</div>
-                    </div>
-                    <div class="summary-icon">
-                        <span class="material-symbols-outlined">volunteer_activism</span>
-                    </div>
-                </div>
-
-                <div class="search-box">
-                    <span class="material-symbols-outlined search-icon">search</span>
-                    <input type="text" id="searchInput" class="search-input" placeholder="दानदाता का नाम खोजें..." value="${searchQuery}" oninput="handleSearch(this.value)">
-                </div>
-
-                <div class="section-header">
-                    <div class="section-title">चंदा देने वालों की सूची</div>
+            // Latest Notices Section
+            html += `
+                <div class="section-header" style="margin-top: 10px;">
+                    <h3>📢 नवीनतम सूचनाएं</h3>
+                    <button class="link-btn" onclick="openNoticesPage()">सभी देखें</button>
                 </div>
             `;
 
-            const filtered = yojnaDonors.filter(d => 
-                (d.donorName || '').toLowerCase().includes(searchQuery.toLowerCase())
-            );
-
-            if (filtered.length === 0) {
-                html += `<div class="loader">कोई रिकॉर्ड नहीं मिला</div>`;
+            if (notices.length === 0) {
+                html += `<div class="empty-state">कोई सूचना उपलब्ध नहीं है।</div>`;
             } else {
-                filtered.forEach(d => {
+                notices.slice(0, 2).forEach(n => {
                     html += `
-                        <div class="item-card">
-                            <div class="item-left">
-                                <div class="item-title">${d.donorName || 'अज्ञात दानदाता'}</div>
-                                <div class="item-sub">${d.address || ''}</div>
+                        <div class="notice-card" onclick="openNoticesPage()">
+                            <div class="notice-title">${n.title || 'सूचना'}</div>
+                            <div class="notice-desc">${n.content || n.message || ''}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // 2. Yojnas Tab View
+        function renderYojnasView() {
+            let html = `
+                <div class="section-header">
+                    <h3>सभी योजनाएं एवं विकास कार्य</h3>
+                </div>
+            `;
+
+            if (projects.length === 0) {
+                html += `<div class="empty-state">कोई योजना उपलब्ध नहीं है।</div>`;
+            } else {
+                projects.forEach(p => {
+                    const projDonors = donors.filter(d => d.projectId === p.id || d.projectId === p.title);
+                    const totalCollected = projDonors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+
+                    html += `
+                        <div class="yojna-card" onclick="openYojnaDetail('${p.id}')">
+                            <div class="yojna-card-top">
+                                <span class="badge-chip blue">${p.category || 'योजना'}</span>
+                                <span class="badge-chip green">${p.status || 'चालू'}</span>
                             </div>
-                            <div class="item-right">
-                                ₹ ${Number(d.amount || 0).toLocaleString('en-IN')}
+                            <div class="yojna-title">${p.title}</div>
+                            <div class="yojna-desc">${p.description || ''}</div>
+                            <div class="yojna-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">दानदाताओं की संख्या</span>
+                                    <span class="stat-value" style="color:#F8FAFC;">${projDonors.length}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">कुल चंदा</span>
+                                    <span class="stat-value">₹ ${totalCollected.toLocaleString('en-IN')}</span>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -649,9 +910,8 @@
             document.getElementById('mainContent').innerHTML = html;
         }
 
-        // 3. Donors View
+        // 3. Donors Tab View
         function renderDonorsView() {
-            // Group donors by donor name or list all contributions with scheme & date
             let html = `
                 <div class="search-box">
                     <span class="material-symbols-outlined search-icon">search</span>
@@ -659,7 +919,7 @@
                 </div>
 
                 <div class="section-header">
-                    <div class="section-title">सभी दानदाता एवं योगदान</div>
+                    <h3>समस्त दानदाता एवं चंदा विवरण</h3>
                 </div>
             `;
 
@@ -669,20 +929,20 @@
             );
 
             if (filtered.length === 0) {
-                html += `<div class="loader">कोई दानदाता नहीं मिला</div>`;
+                html += `<div class="empty-state">कोई दानदाता रिकॉर्ड नहीं मिला।</div>`;
             } else {
                 filtered.forEach(d => {
-                    const proj = projects.find(p => p.id === d.projectId);
-                    const projName = proj ? proj.title : (d.projectName || 'सामान्य कोष');
+                    const proj = projects.find(p => p.id === d.projectId || p.title === d.projectId);
+                    const yojnaName = proj ? proj.title : (d.projectName || 'सामान्य कोष');
 
                     html += `
-                        <div class="item-card">
-                            <div class="item-left">
-                                <div class="item-title">${d.donorName || 'अज्ञात'}</div>
-                                <div class="item-sub">योजना: ${projName}</div>
-                                ${d.date ? `<div class="item-sub" style="font-size: 0.75rem; color: #888;">दिनांक: ${d.date}</div>` : ''}
+                        <div class="list-card">
+                            <div class="list-card-left">
+                                <div class="list-card-title">${d.donorName || 'अज्ञात दानदाता'}</div>
+                                <div class="list-card-sub">योजना: ${yojnaName}</div>
+                                ${d.date ? `<div class="list-card-sub" style="font-size:0.75rem;">दिनांक: ${d.date}</div>` : ''}
                             </div>
-                            <div class="item-right">
+                            <div class="list-card-right">
                                 ₹ ${Number(d.amount || 0).toLocaleString('en-IN')}
                             </div>
                         </div>
@@ -693,16 +953,68 @@
             document.getElementById('mainContent').innerHTML = html;
         }
 
-        // 4. Notices View
+        // 4. Yojna Detail View
+        function renderYojnaDetailView() {
+            if (!selectedProject) return;
+
+            const projDonors = donors.filter(d => d.projectId === selectedProject.id || d.projectId === selectedProject.title);
+            const projExpenses = expenses.filter(e => e.projectId === selectedProject.id || e.projectId === selectedProject.title);
+
+            const totalCollected = projDonors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+            const totalSpent = projExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+
+            let html = `
+                <div class="yojna-card" style="cursor:default;">
+                    <div class="yojna-title">${selectedProject.title}</div>
+                    <div class="yojna-desc">${selectedProject.description || ''}</div>
+                    <div class="yojna-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">कुल प्राप्त चंदा</span>
+                            <span class="stat-value">₹ ${totalCollected.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">कुल व्यय (खर्च)</span>
+                            <span class="stat-value" style="color:#EF4444;">₹ ${totalSpent.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header" style="margin-top:8px;">
+                    <h3>चंदा देने वालों की सूची (${projDonors.length})</h3>
+                </div>
+            `;
+
+            if (projDonors.length === 0) {
+                html += `<div class="empty-state">इस योजना में अभी कोई दानदाता दर्ज नहीं है।</div>`;
+            } else {
+                projDonors.forEach(d => {
+                    html += `
+                        <div class="list-card">
+                            <div class="list-card-left">
+                                <div class="list-card-title">${d.donorName || 'अज्ञात दानदाता'}</div>
+                                <div class="list-card-sub">${d.address || 'कल्याणपुर'}</div>
+                            </div>
+                            <div class="list-card-right">
+                                ₹ ${Number(d.amount || 0).toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // 5. Notices View
         function renderNoticesView() {
             let html = `
                 <div class="section-header">
-                    <div class="section-title">महत्वपूर्ण सूचनाएं एवं घोषणाएं</div>
+                    <h3>आधिकारिक सूचनाएं एवं घोषणाएं</h3>
                 </div>
             `;
 
             if (notices.length === 0) {
-                html += `<div class="loader">वर्तमान में कोई नई सूचना उपलब्ध नहीं है।</div>`;
+                html += `<div class="empty-state">कोई नवीनतम सूचना उपलब्ध नहीं है।</div>`;
             } else {
                 notices.forEach(n => {
                     html += `
@@ -718,10 +1030,71 @@
             document.getElementById('mainContent').innerHTML = html;
         }
 
+        // 6. Admin View
+        function renderAdminView() {
+            if (!isAdminLoggedIn) {
+                let html = `
+                    <div class="admin-box">
+                        <h3 style="color:#F8FAFC; text-align:center;">एडमिन लॉगिन</h3>
+                        <div class="form-group">
+                            <label>पासवर्ड दर्ज करें:</label>
+                            <input type="password" id="adminPass" class="form-control" placeholder="पासवर्ड">
+                        </div>
+                        <button class="btn-submit" onclick="loginAdmin()">लॉगिन करें</button>
+                    </div>
+                `;
+                document.getElementById('mainContent').innerHTML = html;
+                return;
+            }
+
+            let html = `
+                <div class="admin-box">
+                    <h3 style="color:#38BDF8;">नई सूचना प्रकाशित करें</h3>
+                    <div class="form-group">
+                        <label>सूचना का शीर्षक:</label>
+                        <input type="text" id="noticeTitleInput" class="form-control" placeholder="जैसे: विशेष बैठक">
+                    </div>
+                    <div class="form-group">
+                        <label>विवरण:</label>
+                        <textarea id="noticeDescInput" class="form-control" rows="3" placeholder="सूचना का विवरण लिखें..."></textarea>
+                    </div>
+                    <button class="btn-submit" onclick="publishNotice()">प्रकाशित करें</button>
+                </div>
+            `;
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function loginAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === 'admin' || pass === '1234') {
+                isAdminLoggedIn = true;
+                renderAdminView();
+            } else {
+                alert('गलत पासवर्ड! (डिफ़ॉल्ट पासवर्ड: admin)');
+            }
+        }
+
+        function publishNotice() {
+            const title = document.getElementById('noticeTitleInput').value;
+            const content = document.getElementById('noticeDescInput').value;
+            if (!title || !content) {
+                alert('कृपया शीर्षक एवं विवरण दर्ज करें');
+                return;
+            }
+
+            db.collection('notices').add({
+                title: title,
+                content: content,
+                date: new Date().toLocaleDateString('hi-IN')
+            }).then(() => {
+                alert('सूचना प्रकाशित कर दी गई!');
+                switchTab('home');
+            });
+        }
+
         function handleSearch(val) {
             searchQuery = val;
             renderCurrentView();
-            // Restore focus
             const input = document.getElementById('searchInput');
             if (input) {
                 input.focus();
@@ -729,8 +1102,8 @@
             }
         }
 
-        // Start App
-        initFirestoreListeners();
+        // Start Listeners
+        initListeners();
     </script>
 </body>
 </html>
