@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ग्राम पंचायत कल्याणपुर</title>
+    <title>ग्राम पंचायत कल्याणपुर - Web App</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1E293B">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="कल्याणपुर पंचायत">
     
     <!-- Material Symbols Icons -->
@@ -24,8 +25,8 @@
             --bg-dark: #0F172A;
             --surface-dark: #1E293B;
             --surface-variant: #334155;
-            --primary-blue: #1D4ED8;
-            --primary-green: #15803D;
+            --primary-blue: #2563EB;
+            --primary-green: #16A34A;
             --accent-orange: #EA580C;
             --text-primary: #F8FAFC;
             --text-secondary: #94A3B8;
@@ -49,7 +50,7 @@
             color: var(--text-primary);
         }
 
-        /* Phone frame layout on desktop, full screen on mobile */
+        /* App Shell Frame */
         .app-container {
             width: 100%;
             max-width: 480px;
@@ -79,7 +80,7 @@
             }
         }
 
-        /* Top App Bar */
+        /* Top Bar */
         .top-bar {
             background-color: #1E293B;
             color: var(--text-primary);
@@ -142,7 +143,7 @@
             font-weight: bold;
         }
 
-        /* Main Scroll Content */
+        /* Main Scroll Area */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -231,7 +232,7 @@
             opacity: 0.8;
         }
 
-        /* Quick Service Grid Cards */
+        /* Service Grid */
         .service-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -304,7 +305,7 @@
             cursor: pointer;
         }
 
-        /* Search Input */
+        /* Search Box */
         .search-box {
             position: relative;
             width: 100%;
@@ -333,7 +334,7 @@
             color: var(--text-secondary);
         }
 
-        /* Yojna Item Card */
+        /* Cards */
         .yojna-card {
             background-color: var(--surface-dark);
             border: 1px solid var(--card-border);
@@ -408,7 +409,7 @@
             color: #4ADE80;
         }
 
-        /* Generic List Item (Donor / Expense) */
+        /* Donor List Item */
         .list-card {
             background-color: var(--surface-dark);
             border: 1px solid var(--card-border);
@@ -441,6 +442,7 @@
             font-size: 1.05rem;
             font-weight: 700;
             color: #4ADE80;
+            text-align: right;
         }
 
         /* Notice Card */
@@ -473,7 +475,7 @@
             text-align: right;
         }
 
-        /* Bottom Navigation Bar */
+        /* Bottom Nav */
         .bottom-nav {
             background-color: #1E293B;
             border-top: 1px solid var(--card-border);
@@ -506,7 +508,7 @@
             font-size: 24px;
         }
 
-        /* Admin Form */
+        /* Admin Forms */
         .admin-box {
             background-color: var(--surface-dark);
             border: 1px solid var(--card-border);
@@ -547,7 +549,40 @@
             border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 6px;
+        }
+
+        .btn-danger {
+            background: #DC2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .admin-tab-btns {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .admin-tab-btn {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .admin-tab-btn.active {
+            background: #2563EB;
         }
 
         .empty-state {
@@ -582,7 +617,7 @@
             </button>
         </div>
 
-        <!-- Main Dynamic Content Area -->
+        <!-- Main Dynamic Scroll Content Area -->
         <div class="content-area" id="mainContent">
             <!-- Rendered dynamically -->
         </div>
@@ -609,7 +644,7 @@
     </div>
 
     <script>
-        // Firebase Config
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBBV9CHKtYdx1kFK0u0dJQAlCxRwRBSjDs",
             authDomain: "gen-lang-client-0040997999.firebaseapp.com",
@@ -624,7 +659,7 @@
         // Target Firestore Database
         const db = firebase.app().firestore("ai-studio-android-kalyanpu-c4bb409e-4099-4c4f-b05f-1ddd344d1652");
 
-        // State variables
+        // State
         let projects = [];
         let donors = [];
         let expenses = [];
@@ -634,6 +669,7 @@
         let selectedProject = null;
         let showNoticesScreen = false;
         let isAdminLoggedIn = false;
+        let activeAdminSubTab = 'add_donor';
 
         // PWA Install Prompt
         let deferredPrompt = null;
@@ -663,7 +699,7 @@
             }
         }
 
-        // Fetch Firestore Realtime Data
+        // Fetch Firestore Data Live
         function initListeners() {
             db.collection("projects").onSnapshot(s => {
                 projects = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -690,7 +726,7 @@
             });
         }
 
-        // Navigation Management
+        // Navigation
         function switchTab(tab) {
             currentTab = tab;
             selectedProject = null;
@@ -757,7 +793,7 @@
             else if (currentTab === 'admin') renderAdminView();
         }
 
-        // 1. Home View (Matches Jetpack Compose Preview Exactly!)
+        // 1. Home View
         function renderHomeView() {
             const isPwaInstalled = localStorage.getItem('pwa_installed') === 'true';
 
@@ -770,7 +806,6 @@
                 </div>
             `;
 
-            // Add to Home Screen Banner if not dismissed/installed
             if (!isPwaInstalled) {
                 html += `
                     <div id="pwaBanner" class="pwa-card">
@@ -786,7 +821,6 @@
                 `;
             }
 
-            // Quick Service Cards
             html += `
                 <div class="service-grid">
                     <div class="service-card blue" onclick="switchTab('yojnas')">
@@ -799,7 +833,6 @@
                     </div>
                 </div>
 
-                <!-- Yojna Dashboard Section -->
                 <div class="section-header">
                     <div>
                         <h3>🏗️ सभी योजनाएं एवं अभियान (डैशबोर्ड)</h3>
@@ -845,7 +878,6 @@
                 });
             }
 
-            // Latest Notices Section
             html += `
                 <div class="section-header" style="margin-top: 10px;">
                     <h3>📢 नवीनतम सूचनाएं</h3>
@@ -869,7 +901,7 @@
             document.getElementById('mainContent').innerHTML = html;
         }
 
-        // 2. Yojnas Tab View
+        // 2. Yojnas View
         function renderYojnasView() {
             let html = `
                 <div class="section-header">
@@ -910,7 +942,7 @@
             document.getElementById('mainContent').innerHTML = html;
         }
 
-        // 3. Donors Tab View
+        // 3. Donors View
         function renderDonorsView() {
             let html = `
                 <div class="search-box">
@@ -1030,7 +1062,7 @@
             document.getElementById('mainContent').innerHTML = html;
         }
 
-        // 6. Admin View
+        // 6. Admin Panel
         function renderAdminView() {
             if (!isAdminLoggedIn) {
                 let html = `
@@ -1048,19 +1080,97 @@
             }
 
             let html = `
-                <div class="admin-box">
-                    <h3 style="color:#38BDF8;">नई सूचना प्रकाशित करें</h3>
-                    <div class="form-group">
-                        <label>सूचना का शीर्षक:</label>
-                        <input type="text" id="noticeTitleInput" class="form-control" placeholder="जैसे: विशेष बैठक">
-                    </div>
-                    <div class="form-group">
-                        <label>विवरण:</label>
-                        <textarea id="noticeDescInput" class="form-control" rows="3" placeholder="सूचना का विवरण लिखें..."></textarea>
-                    </div>
-                    <button class="btn-submit" onclick="publishNotice()">प्रकाशित करें</button>
+                <div class="admin-tab-btns">
+                    <button class="admin-tab-btn ${activeAdminSubTab === 'add_donor' ? 'active' : ''}" onclick="setAdminSubTab('add_donor')">+ चंदा प्रविष्टि</button>
+                    <button class="admin-tab-btn ${activeAdminSubTab === 'add_yojna' ? 'active' : ''}" onclick="setAdminSubTab('add_yojna')">+ योजना बनाएं</button>
+                    <button class="admin-tab-btn ${activeAdminSubTab === 'add_notice' ? 'active' : ''}" onclick="setAdminSubTab('add_notice')">+ सूचना प्रकाशित करें</button>
+                    <button class="admin-tab-btn ${activeAdminSubTab === 'add_expense' ? 'active' : ''}" onclick="setAdminSubTab('add_expense')">+ खर्च दर्ज करें</button>
                 </div>
             `;
+
+            if (activeAdminSubTab === 'add_donor') {
+                html += `
+                    <div class="admin-box">
+                        <h3 style="color:#38BDF8;">नया चंदा दर्ज करें</h3>
+                        <div class="form-group">
+                            <label>दानदाता का नाम:</label>
+                            <input type="text" id="donorNameInput" class="form-control" placeholder="जैसे: रमेश कुमार">
+                        </div>
+                        <div class="form-group">
+                            <label>पता / ग्राम:</label>
+                            <input type="text" id="donorAddressInput" class="form-control" placeholder="जैसे: कल्याणपुर">
+                        </div>
+                        <div class="form-group">
+                            <label>योजना चुनें:</label>
+                            <select id="donorYojnaSelect" class="form-control">
+                                <option value="">सामान्य कोष</option>
+                                ${projects.map(p => `<option value="${p.id}">${p.title}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>चंदा राशि (₹):</label>
+                            <input type="number" id="donorAmountInput" class="form-control" placeholder="जैसे: 501">
+                        </div>
+                        <button class="btn-submit" onclick="submitDonor()">चंदा जमा करें</button>
+                    </div>
+                `;
+            } else if (activeAdminSubTab === 'add_yojna') {
+                html += `
+                    <div class="admin-box">
+                        <h3 style="color:#38BDF8;">नई योजना बनाएं</h3>
+                        <div class="form-group">
+                            <label>योजना का नाम:</label>
+                            <input type="text" id="yojnaTitleInput" class="form-control" placeholder="जैसे: दुर्गा पूजा 2026">
+                        </div>
+                        <div class="form-group">
+                            <label>श्रेणी:</label>
+                            <input type="text" id="yojnaCategoryInput" class="form-control" placeholder="जैसे: धार्मिक कार्य / विकास कार्य">
+                        </div>
+                        <div class="form-group">
+                            <label>विवरण:</label>
+                            <textarea id="yojnaDescInput" class="form-control" rows="2" placeholder="योजना का संक्षिप्त विवरण..."></textarea>
+                        </div>
+                        <button class="btn-submit" onclick="submitYojna()">योजना सहेजें</button>
+                    </div>
+                `;
+            } else if (activeAdminSubTab === 'add_notice') {
+                html += `
+                    <div class="admin-box">
+                        <h3 style="color:#38BDF8;">नई सूचना प्रकाशित करें</h3>
+                        <div class="form-group">
+                            <label>सूचना का शीर्षक:</label>
+                            <input type="text" id="noticeTitleInput" class="form-control" placeholder="जैसे: विशेष ग्राम सभा">
+                        </div>
+                        <div class="form-group">
+                            <label>विवरण:</label>
+                            <textarea id="noticeDescInput" class="form-control" rows="3" placeholder="सूचना का पूरा विवरण..."></textarea>
+                        </div>
+                        <button class="btn-submit" onclick="submitNotice()">प्रकाशित करें</button>
+                    </div>
+                `;
+            } else if (activeAdminSubTab === 'add_expense') {
+                html += `
+                    <div class="admin-box">
+                        <h3 style="color:#38BDF8;">खर्च राशि दर्ज करें</h3>
+                        <div class="form-group">
+                            <label>योजना चुनें:</label>
+                            <select id="expenseYojnaSelect" class="form-control">
+                                ${projects.map(p => `<option value="${p.id}">${p.title}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>खर्च का विवरण:</label>
+                            <input type="text" id="expenseTitleInput" class="form-control" placeholder="जैसे: टेंट व माइक व्यवस्था">
+                        </div>
+                        <div class="form-group">
+                            <label>खर्च राशि (₹):</label>
+                            <input type="number" id="expenseAmountInput" class="form-control" placeholder="जैसे: 2500">
+                        </div>
+                        <button class="btn-submit" onclick="submitExpense()">खर्च सहेजें</button>
+                    </div>
+                `;
+            }
+
             document.getElementById('mainContent').innerHTML = html;
         }
 
@@ -1070,15 +1180,67 @@
                 isAdminLoggedIn = true;
                 renderAdminView();
             } else {
-                alert('गलत पासवर्ड! (डिफ़ॉल्ट पासवर्ड: admin)');
+                alert('गलत पासवर्ड! (पासवर्ड: admin)');
             }
         }
 
-        function publishNotice() {
+        function setAdminSubTab(tab) {
+            activeAdminSubTab = tab;
+            renderAdminView();
+        }
+
+        function submitDonor() {
+            const name = document.getElementById('donorNameInput').value;
+            const addr = document.getElementById('donorAddressInput').value;
+            const yojnaId = document.getElementById('donorYojnaSelect').value;
+            const amount = Number(document.getElementById('donorAmountInput').value);
+
+            if (!name || !amount) {
+                alert('कृपया दानदाता का नाम एवं राशि दर्ज करें');
+                return;
+            }
+
+            db.collection('donors').add({
+                donorName: name,
+                address: addr || 'कल्याणपुर',
+                projectId: yojnaId,
+                amount: amount,
+                date: new Date().toLocaleDateString('hi-IN')
+            }).then(() => {
+                alert('चंदा सफलतापूर्वक दर्ज हो गया!');
+                switchTab('home');
+            });
+        }
+
+        function submitYojna() {
+            const title = document.getElementById('yojnaTitleInput').value;
+            const cat = document.getElementById('yojnaCategoryInput').value;
+            const desc = document.getElementById('yojnaDescInput').value;
+
+            if (!title) {
+                alert('कृपया योजना का नाम दर्ज करें');
+                return;
+            }
+
+            db.collection('projects').add({
+                title: title,
+                category: cat || 'सामान्य कार्य',
+                description: desc || '',
+                status: 'सक्रिय',
+                totalCollected: 0,
+                totalSpent: 0
+            }).then(() => {
+                alert('नई योजना बन गई!');
+                switchTab('home');
+            });
+        }
+
+        function submitNotice() {
             const title = document.getElementById('noticeTitleInput').value;
             const content = document.getElementById('noticeDescInput').value;
+
             if (!title || !content) {
-                alert('कृपया शीर्षक एवं विवरण दर्ज करें');
+                alert('कृपया शीर्षक और विवरण दर्ज करें');
                 return;
             }
 
@@ -1087,7 +1249,28 @@
                 content: content,
                 date: new Date().toLocaleDateString('hi-IN')
             }).then(() => {
-                alert('सूचना प्रकाशित कर दी गई!');
+                alert('सूचना प्रकाशित हो गई!');
+                switchTab('home');
+            });
+        }
+
+        function submitExpense() {
+            const yojnaId = document.getElementById('expenseYojnaSelect').value;
+            const title = document.getElementById('expenseTitleInput').value;
+            const amount = Number(document.getElementById('expenseAmountInput').value);
+
+            if (!yojnaId || !title || !amount) {
+                alert('कृपया सभी फ़ील्ड भरें');
+                return;
+            }
+
+            db.collection('expenses').add({
+                projectId: yojnaId,
+                title: title,
+                amount: amount,
+                date: new Date().toLocaleDateString('hi-IN')
+            }).then(() => {
+                alert('खर्च दर्ज हो गया!');
                 switchTab('home');
             });
         }
@@ -1102,7 +1285,7 @@
             }
         }
 
-        // Start Listeners
+        // Start
         initListeners();
     </script>
 </body>
