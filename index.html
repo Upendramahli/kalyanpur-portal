@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>कल्याणपुर समिति - Chanda App</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E7D32">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="कल्याणपुर समिति">
+    
+    <!-- Material Symbols Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <!-- Google Fonts Hindi -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase App & Firestore SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #2E7D32;
+            --primary-light: #E8F5E9;
+            --secondary: #1976D2;
+            --bg: #F5F7FA;
+            --card-bg: #FFFFFF;
+            --text-main: #212121;
+            --text-sub: #616161;
+            --accent: #FF9800;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Hind', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* App Container - Phone Frame on Desktop, Full Width on Mobile */
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 920px;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        @media (max-width: 500px) {
+            .app-container {
+                max-width: 100%;
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        @media (min-width: 501px) {
+            .app-container {
+                border-radius: 24px;
+                border: 4px solid #333;
+            }
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background-color: var(--primary);
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .top-bar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 6px;
+            border-radius: 50%;
+        }
+
+        .icon-btn:active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #E53935;
+            color: white;
+            font-size: 0.65rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Add To Home Screen Banner */
+        .pwa-banner {
+            background-color: #E8F5E9;
+            border-bottom: 2px solid #C8E6C9;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+
+        .pwa-banner-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* Content Scroll Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Summary Cards */
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .summary-card:active {
+            transform: scale(0.98);
+        }
+
+        .summary-info h3 {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        .summary-info .amount {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+
+        .summary-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Search Bar */
+        .search-box {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: white;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-sub);
+        }
+
+        /* List Items */
+        .item-card {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .item-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .item-sub {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .item-right {
+            text-align: right;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        /* Navigation Bar */
+        .bottom-nav {
+            background: white;
+            border-top: 1px solid #E0E0E0;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            padding: 4px 0;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 24px;
+        }
+
+        /* Notice Card */
+        .notice-card {
+            background: white;
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin-bottom: 12px;
+        }
+
+        .notice-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .notice-desc {
+            font-size: 0.9rem;
+            color: #424242;
+            line-height: 1.4;
+        }
+
+        .notice-date {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        /* Loader */
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            color: var(--text-sub);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button id="backBtn" class="icon-btn hidden" onclick="goHome()">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <div class="top-bar-title" id="pageTitle">
+                <span class="material-symbols-outlined">account_balance_wallet</span>
+                <span>कल्याणपुर विकास समिति</span>
+            </div>
+            <div class="top-bar-actions">
+                <button class="icon-btn" onclick="switchTab('notices')" title="सूचनाएं">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span id="noticeBadge" class="badge hidden">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add to Home Screen Banner -->
+        <div id="pwaBanner" class="pwa-banner">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined" style="color: var(--primary);">add_to_home_screen</span>
+                <span>ऐप को मोबाइल होम स्क्रीन पर जोड़ें</span>
+            </div>
+            <button class="pwa-banner-btn" onclick="addToHomeScreen()">Add to Home Screen</button>
+        </div>
+
+        <!-- Main Dynamic Content Container -->
+        <div class="content-area" id="mainContent">
+            <!-- Dynamic Content Injected Here via JavaScript -->
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button id="navHome" class="nav-item active" onclick="switchTab('home')">
+                <span class="material-symbols-outlined">home</span>
+                <span>होम</span>
+            </button>
+            <button id="navDonors" class="nav-item" onclick="switchTab('donors')">
+                <span class="material-symbols-outlined">group</span>
+                <span>दानदाता सूची</span>
+            </button>
+            <button id="navNotices" class="nav-item" onclick="switchTab('notices')">
+                <span class="material-symbols-outlined">campaign</span>
+                <span>सूचनाएं</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBV9CHKtYdx1kFK0u0dJQAlCxRwRBSjDs",
+            authDomain: "gen-lang-client-0040997999.firebaseapp.com",
+            projectId: "gen-lang-client-0040997999",
+            storageBucket: "gen-lang-client-0040997999.firebasestorage.app"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        // Target Firestore Database
+        const db = firebase.app().firestore("ai-studio-android-kalyanpu-c4bb409e-4099-4c4f-b05f-1ddd344d1652");
+
+        // State Data
+        let projects = [];
+        let donors = [];
+        let notices = [];
+        let registeredDonors = [];
+        let currentTab = 'home';
+        let searchQuery = '';
+        let selectedYojnaId = null;
+
+        // PWA Install Prompt handling
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const isInstalled = localStorage.getItem('pwa_installed');
+            if (!isInstalled) {
+                document.getElementById('pwaBanner').classList.remove('hidden');
+            }
+        });
+
+        if (localStorage.getItem('pwa_installed') === 'true') {
+            document.getElementById('pwaBanner').classList.add('hidden');
+        }
+
+        function addToHomeScreen() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        localStorage.setItem('pwa_installed', 'true');
+                        document.getElementById('pwaBanner').classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("होम स्क्रीन पर जोड़ने के लिए ब्राउजर मेनू से 'Add to Home screen' चुनें।");
+                localStorage.setItem('pwa_installed', 'true');
+                document.getElementById('pwaBanner').classList.add('hidden');
+            }
+        }
+
+        // Fetch Real-time Firestore Data
+        function initFirestoreListeners() {
+            // Listen to Projects / Yojna
+            db.collection("projects").onSnapshot(snapshot => {
+                projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCurrentView();
+            });
+
+            // Listen to Donors
+            db.collection("donors").onSnapshot(snapshot => {
+                donors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderCurrentView();
+            });
+
+            // Listen to Notices
+            db.collection("notices").onSnapshot(snapshot => {
+                notices = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const badge = document.getElementById('noticeBadge');
+                if (notices.length > 0) {
+                    badge.innerText = notices.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+                renderCurrentView();
+            });
+        }
+
+        // Navigation
+        function switchTab(tab) {
+            currentTab = tab;
+            selectedYojnaId = null;
+            searchQuery = '';
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('backBtn').classList.add('hidden');
+
+            if (tab === 'home') {
+                document.getElementById('navHome').classList.add('active');
+                document.getElementById('pageTitle').innerHTML = '<span class="material-symbols-outlined">account_balance_wallet</span> <span>कल्याणपुर विकास समिति</span>';
+            } else if (tab === 'donors') {
+                document.getElementById('navDonors').classList.add('active');
+                document.getElementById('pageTitle').innerHTML = '<span>दानदाता सूची</span>';
+            } else if (tab === 'notices') {
+                document.getElementById('navNotices').classList.add('active');
+                document.getElementById('pageTitle').innerHTML = '<span>सूचनाएं</span>';
+            }
+
+            renderCurrentView();
+        }
+
+        function viewYojnaDonors(yojnaId, yojnaName) {
+            selectedYojnaId = yojnaId;
+            document.getElementById('backBtn').classList.remove('hidden');
+            document.getElementById('pageTitle').innerHTML = `<span>${yojnaName || 'योजना विवरण'}</span>`;
+            renderYojnaDetailView(yojnaId, yojnaName);
+        }
+
+        function goHome() {
+            switchTab('home');
+        }
+
+        // Render Routing
+        function renderCurrentView() {
+            if (selectedYojnaId) {
+                const proj = projects.find(p => p.id === selectedYojnaId);
+                renderYojnaDetailView(selectedYojnaId, proj ? proj.title : '');
+                return;
+            }
+
+            if (currentTab === 'home') renderHomeView();
+            else if (currentTab === 'donors') renderDonorsView();
+            else if (currentTab === 'notices') renderNoticesView();
+        }
+
+        // 1. Home View
+        function renderHomeView() {
+            const totalChanda = donors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+
+            let html = `
+                <!-- Total Chanda Card -->
+                <div class="summary-card" onclick="switchTab('donors')">
+                    <div class="summary-info">
+                        <h3>कुल प्राप्त चंदा</h3>
+                        <div class="amount">₹ ${totalChanda.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="summary-icon">
+                        <span class="material-symbols-outlined">payments</span>
+                    </div>
+                </div>
+
+                <!-- Active Yojnas Section -->
+                <div class="section-header">
+                    <div class="section-title">सक्रिय योजनाएं</div>
+                </div>
+            `;
+
+            if (projects.length === 0) {
+                html += `<div class="loader">कोई योजना उपलब्ध नहीं है</div>`;
+            } else {
+                projects.forEach(p => {
+                    const yojnaDonors = donors.filter(d => d.projectId === p.id);
+                    const yojnaTotal = yojnaDonors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+
+                    html += `
+                        <div class="item-card" onclick="viewYojnaDonors('${p.id}', '${p.title.replace(/'/g, "\\'")}')">
+                            <div class="item-left">
+                                <div class="item-title">${p.title}</div>
+                                <div class="item-sub">${yojnaDonors.length} दानदाता</div>
+                            </div>
+                            <div class="item-right">
+                                ₹ ${yojnaTotal.toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // 2. Yojna Detail View (Clicking Total Chanda or Yojna)
+        function renderYojnaDetailView(yojnaId, yojnaName) {
+            const yojnaDonors = donors.filter(d => d.projectId === yojnaId);
+            const totalAmount = yojnaDonors.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+
+            let html = `
+                <div class="summary-card" style="margin-bottom: 8px;">
+                    <div class="summary-info">
+                        <h3>योजना का कुल चंदा</h3>
+                        <div class="amount">₹ ${totalAmount.toLocaleString('en-IN')}</div>
+                    </div>
+                    <div class="summary-icon">
+                        <span class="material-symbols-outlined">volunteer_activism</span>
+                    </div>
+                </div>
+
+                <div class="search-box">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="दानदाता का नाम खोजें..." value="${searchQuery}" oninput="handleSearch(this.value)">
+                </div>
+
+                <div class="section-header">
+                    <div class="section-title">चंदा देने वालों की सूची</div>
+                </div>
+            `;
+
+            const filtered = yojnaDonors.filter(d => 
+                (d.donorName || '').toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                html += `<div class="loader">कोई रिकॉर्ड नहीं मिला</div>`;
+            } else {
+                filtered.forEach(d => {
+                    html += `
+                        <div class="item-card">
+                            <div class="item-left">
+                                <div class="item-title">${d.donorName || 'अज्ञात दानदाता'}</div>
+                                <div class="item-sub">${d.address || ''}</div>
+                            </div>
+                            <div class="item-right">
+                                ₹ ${Number(d.amount || 0).toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // 3. Donors View
+        function renderDonorsView() {
+            // Group donors by donor name or list all contributions with scheme & date
+            let html = `
+                <div class="search-box">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="दानदाता का नाम या पता खोजें..." value="${searchQuery}" oninput="handleSearch(this.value)">
+                </div>
+
+                <div class="section-header">
+                    <div class="section-title">सभी दानदाता एवं योगदान</div>
+                </div>
+            `;
+
+            const filtered = donors.filter(d => 
+                (d.donorName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (d.address || '').toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                html += `<div class="loader">कोई दानदाता नहीं मिला</div>`;
+            } else {
+                filtered.forEach(d => {
+                    const proj = projects.find(p => p.id === d.projectId);
+                    const projName = proj ? proj.title : (d.projectName || 'सामान्य कोष');
+
+                    html += `
+                        <div class="item-card">
+                            <div class="item-left">
+                                <div class="item-title">${d.donorName || 'अज्ञात'}</div>
+                                <div class="item-sub">योजना: ${projName}</div>
+                                ${d.date ? `<div class="item-sub" style="font-size: 0.75rem; color: #888;">दिनांक: ${d.date}</div>` : ''}
+                            </div>
+                            <div class="item-right">
+                                ₹ ${Number(d.amount || 0).toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // 4. Notices View
+        function renderNoticesView() {
+            let html = `
+                <div class="section-header">
+                    <div class="section-title">महत्वपूर्ण सूचनाएं एवं घोषणाएं</div>
+                </div>
+            `;
+
+            if (notices.length === 0) {
+                html += `<div class="loader">वर्तमान में कोई नई सूचना उपलब्ध नहीं है।</div>`;
+            } else {
+                notices.forEach(n => {
+                    html += `
+                        <div class="notice-card">
+                            <div class="notice-title">${n.title || 'सूचना'}</div>
+                            <div class="notice-desc">${n.content || n.message || ''}</div>
+                            ${n.date ? `<div class="notice-date">${n.date}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function handleSearch(val) {
+            searchQuery = val;
+            renderCurrentView();
+            // Restore focus
+            const input = document.getElementById('searchInput');
+            if (input) {
+                input.focus();
+                input.setSelectionRange(val.length, val.length);
+            }
+        }
+
+        // Start App
+        initFirestoreListeners();
+    </script>
+</body>
+</html>
