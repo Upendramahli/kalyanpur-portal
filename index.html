@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ग्राम पंचायत कल्याणपुर - Web App</title>
+    <title>ग्राम पंचायत कल्याणपुर</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1E293B">
+    <meta name="theme-color" content="#138808">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -22,15 +22,19 @@
 
     <style>
         :root {
-            --bg-dark: #0F172A;
+            --bg-dark: #121826;
             --surface-dark: #1E293B;
             --surface-variant: #334155;
-            --primary-blue: #2563EB;
-            --primary-green: #16A34A;
-            --accent-orange: #EA580C;
+            --primary-green: #138808;
+            --primary-blue: #0055A5;
+            --accent-green: #2E7D32;
             --text-primary: #F8FAFC;
             --text-secondary: #94A3B8;
             --card-border: #334155;
+            --badge-green-bg: rgba(46, 125, 50, 0.2);
+            --badge-green-text: #4ADE80;
+            --badge-blue-bg: rgba(25, 118, 210, 0.2);
+            --badge-blue-text: #60A5FA;
         }
 
         * {
@@ -42,7 +46,7 @@
         }
 
         body {
-            background-color: #020617;
+            background-color: #0B0F19;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -50,7 +54,7 @@
             color: var(--text-primary);
         }
 
-        /* App Shell Frame */
+        /* App Container Phone Frame */
         .app-container {
             width: 100%;
             max-width: 480px;
@@ -60,7 +64,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
             overflow: hidden;
         }
 
@@ -76,11 +80,11 @@
         @media (min-width: 501px) {
             .app-container {
                 border-radius: 24px;
-                border: 4px solid #334155;
+                border: 3px solid #334155;
             }
         }
 
-        /* Top Bar */
+        /* Top Bar (Exact Match to Jetpack Compose TopAppBar) */
         .top-bar {
             background-color: #1E293B;
             color: var(--text-primary);
@@ -99,7 +103,7 @@
         }
 
         .top-bar-title h1 {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 700;
             line-height: 1.2;
             color: #F8FAFC;
@@ -143,7 +147,7 @@
             font-weight: bold;
         }
 
-        /* Main Scroll Area */
+        /* Content Area */
         .content-area {
             flex: 1;
             overflow-y: auto;
@@ -153,7 +157,7 @@
             gap: 16px;
         }
 
-        /* Hero Banner Card */
+        /* Hero Header Card */
         .hero-card {
             background: linear-gradient(135deg, #138808 0%, #0055A5 100%);
             border-radius: 16px;
@@ -168,8 +172,8 @@
         }
 
         .hero-card .material-symbols-outlined {
-            font-size: 42px;
-            margin-bottom: 4px;
+            font-size: 44px;
+            margin-bottom: 2px;
         }
 
         .hero-card h2 {
@@ -232,7 +236,7 @@
             opacity: 0.8;
         }
 
-        /* Service Grid */
+        /* Service Grid Cards */
         .service-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -305,7 +309,7 @@
             cursor: pointer;
         }
 
-        /* Search Box */
+        /* Search Input */
         .search-box {
             position: relative;
             width: 100%;
@@ -364,13 +368,13 @@
         }
 
         .badge-chip.blue {
-            background: rgba(59, 130, 246, 0.2);
-            color: #60A5FA;
+            background: var(--badge-blue-bg);
+            color: var(--badge-blue-text);
         }
 
         .badge-chip.green {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ADE80;
+            background: var(--badge-green-bg);
+            color: var(--badge-green-text);
         }
 
         .yojna-title {
@@ -409,7 +413,7 @@
             color: #4ADE80;
         }
 
-        /* Donor List Item */
+        /* List Cards */
         .list-card {
             background-color: var(--surface-dark);
             border: 1px solid var(--card-border);
@@ -508,7 +512,7 @@
             font-size: 24px;
         }
 
-        /* Admin Forms */
+        /* Admin Box */
         .admin-box {
             background-color: var(--surface-dark);
             border: 1px solid var(--card-border);
@@ -550,16 +554,6 @@
             font-weight: 700;
             cursor: pointer;
             margin-top: 6px;
-        }
-
-        .btn-danger {
-            background: #DC2626;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
         }
 
         .admin-tab-btns {
@@ -617,9 +611,9 @@
             </button>
         </div>
 
-        <!-- Main Dynamic Scroll Content Area -->
+        <!-- Scrollable Content Area -->
         <div class="content-area" id="mainContent">
-            <!-- Rendered dynamically -->
+            <!-- Dynamic UI Injection -->
         </div>
 
         <!-- Bottom Navigation Bar -->
@@ -671,7 +665,7 @@
         let isAdminLoggedIn = false;
         let activeAdminSubTab = 'add_donor';
 
-        // PWA Install Prompt
+        // PWA Banner
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -699,7 +693,7 @@
             }
         }
 
-        // Fetch Firestore Data Live
+        // Realtime Firestore
         function initListeners() {
             db.collection("projects").onSnapshot(s => {
                 projects = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -726,7 +720,7 @@
             });
         }
 
-        // Navigation
+        // Navigation Bar Switches
         function switchTab(tab) {
             currentTab = tab;
             selectedProject = null;
@@ -793,12 +787,12 @@
             else if (currentTab === 'admin') renderAdminView();
         }
 
-        // 1. Home View
+        // 1. Home Screen
         function renderHomeView() {
             const isPwaInstalled = localStorage.getItem('pwa_installed') === 'true';
 
             let html = `
-                <!-- Hero Header Card -->
+                <!-- Hero Banner -->
                 <div class="hero-card">
                     <span class="material-symbols-outlined">account_balance</span>
                     <h2>ग्राम पंचायत कल्याणपुर</h2>
@@ -1285,7 +1279,7 @@
             }
         }
 
-        // Start
+        // Start Listeners
         initListeners();
     </script>
 </body>
